@@ -30,6 +30,7 @@ h1 {
     color: #2c3e50;
     margin-bottom: 1.5rem;
     text-align: center;
+    min-height: 5rem;
 }
 
 .input-group {
@@ -85,4 +86,8 @@ button:hover {
 
 .result p {
     color: #34495e;
+}
+
+.clicker {
+    margin-top: 40px;
 }
