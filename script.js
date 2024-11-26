@@ -1,6 +1,6 @@
 // Функция для форматирования чисел с пробелами между тысячами
 function formatNumber(num) {
-    return isNaN(num) ? '0.00' : num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return isNaN(num) ? '0' : Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 // Банковский калькулятор
