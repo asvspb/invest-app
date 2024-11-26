@@ -6,24 +6,25 @@ function formatNumber(num) {
 // Банковский калькулятор
 function calculate() {
     const initial = parseFloat(document.getElementById('initial').value) || 0;
-    const period = parseInt(document.getElementById('period').value) || 0;
+    const periodMonths = parseInt(document.getElementById('period').value) || 0;
     const rate = (parseFloat(document.getElementById('rate').value) || 0) / 100;
     const reinvest = document.getElementById('reinvest').checked;
 
     let total, profit, monthlyProfit, yearlyProfit;
 
-    if (initial > 0 && period > 0 && rate > 0) {
+    if (initial > 0 && periodMonths > 0 && rate > 0) {
+        const periodYears = periodMonths / 12;
         if (reinvest) {
-            total = initial * Math.pow((1 + rate), period);
+            total = initial * Math.pow((1 + rate), periodYears);
             profit = total - initial;
         } else {
             yearlyProfit = initial * rate;
-            total = initial + yearlyProfit * period;
+            total = initial + (yearlyProfit * periodYears);
             profit = total - initial;
         }
 
-        monthlyProfit = profit / (period * 12);
-        yearlyProfit = profit / period;
+        monthlyProfit = profit / periodMonths;
+        yearlyProfit = profit / periodYears;
     } else {
         total = profit = monthlyProfit = yearlyProfit = 0;
     }
