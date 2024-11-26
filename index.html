@@ -44,22 +44,22 @@
             <h1>Ретейл калькулятор</h1>
             <div class="input-group">
                 <label for="initial">Сумма инвестирования (₽)</label>
-                <input type="number" id="initial" min="0">
+                <input type="number" id="retail-initial" min="0">
             </div>
             <div class="input-group">
-                <label for="period">Период (лет)</label>
-                <input type="number" id="period" min="1">
+                <label for="period">Период (месяцов)</label>
+                <input type="number" id="retail-period" min="1">
             </div>
             <div class="input-group">
-                <label for="rate">Среднемесячная прибыль</label>
-                <input type="number" id="rate" min="0" step="0.1">
+                <label for="rate">Полученная прибыль</label>
+                <input type="number" id="retail-rate" min="0" step="0.1">
             </div>
         </div>
         <button onclick="calculateRetail()">Рассчитать</button>
         <div class="result" id="result">
-            <h2>ГПД: <span id="profit">0 %</span></h2>
-            <p>Прибыль за год: <span id="yearlyProfit">0 ₽</span></p>
-            <p>Итоговая сумма: <span id="total">0 ₽</span></p>
+            <h2>Процент дохода: <span id="retail-profit">0 %</span></h2>
+            <p>Прибыль за год: <span id="retail-yearlyProfit">0 ₽</span></p>
+            <p>Итоговая сумма: <span id="retail-total">0 ₽</span></p>
         </div>
     </div>
     </div>
