@@ -4,35 +4,35 @@ function formatNumber(num) {
 }
 
 // Банковский калькулятор
-function calculate() {
-    const initial = parseFloat(document.getElementById('initial').value) || 0;
-    const periodMonths = parseInt(document.getElementById('period').value) || 0;
-    const rate = (parseFloat(document.getElementById('rate').value) || 0) / 100;
-    const reinvest = document.getElementById('reinvest').checked;
+function calculateBankProfit() {
+    const initialAmount = parseFloat(document.getElementById('amount').value);
+    const period = parseInt(document.getElementById('period').value);
+    const annualPercent = parseFloat(document.getElementById('percent').value);
+    const isReinvest = document.getElementById('reinvest').checked;
+    const monthlyDeposit = parseFloat(document.getElementById('monthly-deposit').value) || 0;
 
-    let total, profit, monthlyProfit, yearlyProfit;
+    let totalAmount = initialAmount;
+    let totalProfit = 0;
+    const monthlyPercent = annualPercent / 12 / 100;
 
-    if (initial > 0 && periodMonths > 0 && rate > 0) {
-        const periodYears = periodMonths / 12;
-        if (reinvest) {
-            total = initial * Math.pow((1 + rate), periodYears);
-            profit = total - initial;
-        } else {
-            yearlyProfit = initial * rate;
-            total = initial + (yearlyProfit * periodYears);
-            profit = total - initial;
+    for (let i = 1; i <= period; i++) {
+        const monthProfit = totalAmount * monthlyPercent;
+        totalProfit += monthProfit;
+
+        if (isReinvest) {
+            totalAmount += monthProfit;
         }
 
-        monthlyProfit = profit / periodMonths;
-        yearlyProfit = profit / periodYears;
-    } else {
-        total = profit = monthlyProfit = yearlyProfit = 0;
+        totalAmount += monthlyDeposit;
     }
 
-    document.getElementById('profit').textContent = formatNumber(profit) + ' ₽';
+    const yearlyProfit = (totalProfit / period) * 12;
+    const monthlyProfit = totalProfit / period;
+
+    document.getElementById('profit').textContent = formatNumber(totalProfit) + ' ₽';
     document.getElementById('monthlyProfit').textContent = formatNumber(monthlyProfit) + ' ₽';
     document.getElementById('yearlyProfit').textContent = formatNumber(yearlyProfit) + ' ₽';
-    document.getElementById('total').textContent = formatNumber(total) + ' ₽';
+    document.getElementById('total').textContent = formatNumber(totalAmount) + ' ₽';
 }
 
 // Ретейл калькулятор
