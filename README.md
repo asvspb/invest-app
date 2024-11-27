@@ -24,14 +24,10 @@
 
 1. Убедитесь, что у вас установлен Docker.
 
-2. Клонируйте репозиторий:
-   `git clone https://github.com/your-username/invest-app.git`
-   `cd invest-app`
+2. Клонируйте докер-репозиторий:
+   `docker pull asvspb/invest-app:latest`
 
-3. Соберите Docker образ:
-    `docker build -t invest-app .`
+3. Запустите контейнер:
+    `docker run -d -p 8585:80 invest-app`
 
-4. Запустите контейнер:
-    `docker run -d -p 8080:80 invest-app`
-
-5. Откройте браузер и перейдите по адресу `http://localhost:8080`
+4. Откройте браузер и перейдите по адресу `http://localhost:8585`
