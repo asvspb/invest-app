@@ -3,6 +3,12 @@ function formatNumber(num) {
     return isNaN(num) ? '0' : Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
+
+// Функция для форматирования чисел с двумя десятичными знаками
+function formatDecimal(num) {
+    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 // Функция для отображения модального окна
 function showModal(content) {
     const modal = document.getElementById('calculationModal');
@@ -24,10 +30,6 @@ function showModal(content) {
     }
 }
 
-// Функция для форматирования чисел с двумя десятичными знаками
-function formatDecimal(num) {
-    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-}
 
 // Банковский калькулятор
 function calculateBankProfit() {
@@ -66,7 +68,7 @@ function calculateBankProfit() {
         }
 
         if (showHow) {
-            calculationDetails += `Итого на конец месяца: ${formatDecimal(totalAmount)} ₽</p>`;
+            calculationDetails += `Итого на конец месяца: ${formatDecimal(totalAmount)} ₽</p><br>`;
         }
     }
 
