@@ -28,6 +28,6 @@
    `docker pull asvspb/invest-app:latest`
 
 3. Запустите контейнер:
-    `docker run -d -p 8585:80 invest-app`
+    `docker run -d -p 8585:3000 invest-app`
 
 4. Откройте браузер и перейдите по адресу `http://localhost:8585`
