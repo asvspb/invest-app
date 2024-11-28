@@ -208,25 +208,65 @@ button:hover {
 .month-details p {
     margin: 5px 0;
 }
+
+
 #calculationDetails {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 15px;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
-#calculationDetails::-webkit-scrollbar {
-    width: 8px;
+#calculationDetails h2 {
+    margin-top: 0;
+    color: #007bff;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
 }
 
-#calculationDetails::-webkit-scrollbar-track {
-    background: #f1f1f1;
+#calculationDetails p {
+    margin: 5px 0;
 }
 
-#calculationDetails::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+.month-details {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-#calculationDetails::-webkit-scrollbar-thumb:hover {
-    background: #555;
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #888;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+}
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+#modalTitle {
+    text-align: center;
+    margin-top: 20px;
 }
