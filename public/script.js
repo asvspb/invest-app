@@ -33,12 +33,41 @@ function showModal(content) {
 
 // Банковский калькулятор
 function calculateBankProfit() {
-    const initialAmount = parseFloat(document.getElementById('amount').value);
-    const period = parseInt(document.getElementById('period').value);
-    const annualPercent = parseFloat(document.getElementById('percent').value);
+    const initialAmountInput = document.getElementById('amount');
+    const periodInput = document.getElementById('period');
+    const annualPercentInput = document.getElementById('percent');
+    const monthlyDepositInput = document.getElementById('monthly-deposit');
+
+    const initialAmount = parseFloat(initialAmountInput.value);
+    const period = parseInt(periodInput.value);
+    const annualPercent = parseFloat(annualPercentInput.value);
     const isReinvest = document.getElementById('reinvest').checked;
-    const monthlyDeposit = parseFloat(document.getElementById('monthly-deposit').value) || 0;
+    const monthlyDeposit = parseFloat(monthlyDepositInput.value) || 0;
     const showHow = document.getElementById('show-how').checked;
+
+    if (isNaN(initialAmount) || initialAmount <= 0) {
+        alert('Пожалуйста, введите корректную сумму инвестирования.');
+        initialAmountInput.focus();
+        return;
+    }
+
+    if (isNaN(period) || period <= 0) {
+        alert('Пожалуйста, введите корректный период.');
+        periodInput.focus();
+        return;
+    }
+
+    if (isNaN(annualPercent) || annualPercent < 0) {
+        alert('Пожалуйста, введите корректный годовой процент.');
+        annualPercentInput.focus();
+        return;
+    }
+
+    if (isNaN(monthlyDeposit) || monthlyDeposit < 0) {
+        alert('Пожалуйста, введите корректное пополнение вклада.');
+        monthlyDepositInput.focus();
+        return;
+    }
 
     let totalAmount = initialAmount;
     let totalProfit = 0;
@@ -87,9 +116,31 @@ function calculateBankProfit() {
 
 // Ретейл калькулятор
 function calculateRetail() {
-    const initial = parseFloat(document.getElementById('retail-initial').value) || 0;
-    const period = parseInt(document.getElementById('retail-period').value) || 0;
-    const profit = parseFloat(document.getElementById('retail-rate').value) || 0;
+    const initialInput = document.getElementById('retail-initial');
+    const periodInput = document.getElementById('retail-period');
+    const profitInput = document.getElementById('retail-rate');
+
+    const initial = parseFloat(initialInput.value) || 0;
+    const period = parseInt(periodInput.value) || 0;
+    const profit = parseFloat(profitInput.value) || 0;
+
+    if (isNaN(initial) || initial < 0) {
+        alert('Пожалуйста, введите корректную сумму инвестирования.');
+        initialInput.focus();
+        return;
+    }
+
+    if (isNaN(period) || period <= 0) {
+        alert('Пожалуйста, введите корректный период.');
+        periodInput.focus();
+        return;
+    }
+
+    if (isNaN(profit) || profit < 0) {
+        alert('Пожалуйста, введите корректную прибыль.');
+        profitInput.focus();
+        return;
+    }
 
     let total, yearlyProfit;
 
