@@ -6,7 +6,7 @@
 
 body {
     display: flex;
-    align-items:stretch;
+    align-items: center;
     justify-content: center;
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -43,7 +43,8 @@ label {
     color: #34495e;
 }
 
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
     width: 100%;
     padding: 0.8rem;
     border: 2px solid #e0e0e0;
@@ -52,7 +53,8 @@ input[type="number"] {
     transition: border-color 0.3s;
 }
 
-input[type="number"]:focus {
+input[type="number"]:focus,
+input[type="text"]:focus {
     border-color: #3498db;
     outline: none;
 }
