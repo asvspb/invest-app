@@ -24,6 +24,8 @@ body {
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 450px;
+    min-height: 600px;
+    justify-content: space-between;
 }
 
 h1 {
