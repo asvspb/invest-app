@@ -3,6 +3,35 @@ function formatNumber(num) {
     return isNaN(num) ? '0' : Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
+// Функция для очистки строки от всех символов кроме цифр
+function parseFormattedNumber(str) {
+    return parseInt(str.replace(/\s/g, '')) || 0;
+}
+
+// Функция для форматирования ввода в поле
+function formatInputNumber(input) {
+    const cursorPosition = input.selectionStart;
+    const value = input.value.replace(/\s/g, '');
+
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+
+    if (!/^\d+$/.test(value)) {
+        input.value = input.value.replace(/[^\d]/g, '');
+        return;
+    }
+
+    const formatted = formatNumber(parseInt(value));
+    input.value = formatted;
+
+    // Восстанавливаем позицию курсора с учетом добавленных пробелов
+    const addedSpaces = formatted.length - value.length;
+    const newPosition = cursorPosition + addedSpaces;
+    input.setSelectionRange(newPosition, newPosition);
+}
+
 
 // Функция для форматирования чисел с двумя десятичными знаками
 function formatDecimal(num) {
@@ -38,11 +67,11 @@ function calculateBankProfit() {
     const annualPercentInput = document.getElementById('percent');
     const monthlyDepositInput = document.getElementById('monthly-deposit');
 
-    const initialAmount = parseFloat(initialAmountInput.value);
+    const initialAmount = parseFormattedNumber(initialAmountInput.value);
     const period = parseInt(periodInput.value);
     const annualPercent = parseFloat(annualPercentInput.value);
     const isReinvest = document.getElementById('reinvest').checked;
-    const monthlyDeposit = parseFloat(monthlyDepositInput.value) || 0;
+    const monthlyDeposit = parseFormattedNumber(monthlyDepositInput.value);
     const showHow = document.getElementById('show-how').checked;
 
     if (isNaN(initialAmount) || initialAmount <= 0) {
@@ -120,9 +149,9 @@ function calculateRetail() {
     const periodInput = document.getElementById('retail-period');
     const profitInput = document.getElementById('retail-rate');
 
-    const initial = parseFloat(initialInput.value) || 0;
+    const initial = parseFormattedNumber(initialInput.value);
     const period = parseInt(periodInput.value) || 0;
-    const profit = parseFloat(profitInput.value) || 0;
+    const profit = parseFormattedNumber(profitInput.value);
 
     if (isNaN(initial) || initial < 0) {
         alert('Пожалуйста, введите корректную сумму инвестирования.');
@@ -158,6 +187,39 @@ function calculateRetail() {
 
 // Инициализация калькуляторов при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    calculate();
-    calculateRetail();
+    // Initialize input fields with default values
+    const amountInputs = [
+        document.getElementById('amount'),
+        document.getElementById('retail-initial'),
+        document.getElementById('monthly-deposit'),
+        document.getElementById('retail-rate')
+    ];
+
+    // Set default values and add input formatting
+    amountInputs.forEach(input => {
+        if (input) {
+            input.value = '0';
+            input.addEventListener('input', () => formatInputNumber(input));
+            input.addEventListener('blur', () => {
+                if (input.value === '') {
+                    input.value = '0';
+                }
+            });
+        }
+    });
+
+    // Initialize other inputs with defaults
+    const defaultInputs = [
+        { id: 'period', value: '1' },
+        { id: 'percent', value: '0' },
+        { id: 'retail-period', value: '1' },
+        { id: 'retail-rate', value: '0' }
+    ];
+
+    defaultInputs.forEach(({ id, value }) => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = value;
+        }
+    });
 });

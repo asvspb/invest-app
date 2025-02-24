@@ -15,7 +15,7 @@
             <form>
                 <div class="form-group">
                     <label for="amount">Сумма инвестирования</label>
-                    <input type="number" class="form-control" id="amount" min="1" required>
+                    <input type="text" class="form-control" id="amount" pattern="[0-9]*" inputmode="numeric" required>
                 </div>
 
                 <div class="form-row">
@@ -30,7 +30,8 @@
                 </div>
                 <div class="form-group">
                     <label for="monthly-deposit">Пополнение вклада</label>
-                    <input type="number" class="form-control" id="monthly-deposit" min="0" required>
+                    <input type="text" class="form-control" id="monthly-deposit" pattern="[0-9]*" inputmode="numeric"
+                        required>
                 </div>
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="reinvest">
@@ -54,7 +55,7 @@
             <h1>Ретейл калькулятор</h1>
             <div class="form-group">
                 <label for="retail-initial">Сумма инвестирования (₽)</label>
-                <input type="number" class="form-control" id="retail-initial" min="0">
+                <input type="text" class="form-control" id="retail-initial" pattern="[0-9]*" inputmode="numeric">
             </div>
             <div class="form-group">
                 <label for="retail-period">Период (месяцов)</label>
@@ -62,7 +63,7 @@
             </div>
             <div class="form-group">
                 <label for="retail-rate">Полученная прибыль</label>
-                <input type="number" class="form-control" id="retail-rate" min="0" step="0.1">
+                <input type="text" class="form-control" id="retail-rate" pattern="[0-9]*" inputmode="numeric">
             </div>
         </div>
         <button class="clicker" onclick="calculateRetail()">Рассчитать</button>
