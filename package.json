@@ -1,0 +1,27 @@
+{
+  "name": "invest-app",
+  "version": "1.0.0",
+  "description": "Это простое веб-приложение, которое включает в себя два калькулятора: банковский калькулятор и ретейл калькулятор. Приложение позволяет пользователям рассчитывать прибыль от инвестиций в различных сценариях.",
+  "homepage": "https://github.com/asvspb/invest-app#readme",
+  "bugs": {
+    "url": "https://github.com/asvspb/invest-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asvspb/invest-app.git"
+  },
+  "license": "ISC",
+  "author": "asv",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
