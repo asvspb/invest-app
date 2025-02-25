@@ -21,15 +21,14 @@ body {
     background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
     padding: 2.5rem;
     border-radius: 20px;
-    box-shadow: 
-        0 10px 30px rgba(0,0,0,0.08),
-        0 0 0 1px rgba(0,0,0,0.01);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.01);
     width: 100%;
     max-width: 450px;
-    min-height: 650px;
-    justify-content: space-between;
+    min-height: 820px;
+    justify-content: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 
 .calculator-container:hover {
     transform: translateY(-5px);
@@ -97,10 +96,11 @@ input[type="number"]:focus {
 
 .form-check {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
-    margin: 1.25rem 0;
+    /* margin: 1.25rem 0; */
     padding: 0.5rem 0;
+    justify-content: flex-end;
 }
 
 .form-check-input {
