@@ -1,96 +1,51 @@
-# Служебные папки и файлы
-.DS_Store
-.DS_Store?
-._*
-.qodo
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-pwd
-tmp
-log
-logs
-tmp
-.mapbox
+# Dependencies
 node_modules/
-venv/
-env/
-*.py[cod]
-*.so
-.Python
--build
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
 
-#okay, the above is perhaps more comprehensive than necessary, but I see that the user wants just service folders and files, so perhaps it's better to stick with common ones:
-# Common service files
-.idea/
-.vscode/
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Environment variables
+.env
+.env.local
+.env.*.local
 
-# Temporary and log files
-*.log
-*.tmp
-tmp/
-log/
+# Build output
+/dist
+/build
+/.next
+/out
 
-# OS specific
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE specific
+# IDE and editor files
 .idea/
 .vscode/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db
 
-# Python specific
-venv/
-env/
-*.py[cod]
-__pycache__/
-*.so
+# Testing
+/coverage
+.nyc_output
 
-# Node.js specific
-node_modules/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Additional
-.gif
-.png
-.jpg
-ungkin
+# Optional temp files
+.temp
+.tmp
+.cache
+
+# System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
