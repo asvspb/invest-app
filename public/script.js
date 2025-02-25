@@ -210,8 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize other inputs with defaults
     const defaultInputs = [
-        { id: 'period', value: '1' },
-        { id: 'percent', value: '0' },
+        { id: 'period', value: '12' },
+        { id: 'percent', value: '10' },
         { id: 'retail-period', value: '1' },
         { id: 'retail-rate', value: '0' }
     ];
