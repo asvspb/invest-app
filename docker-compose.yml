@@ -1,9 +1,11 @@
-version: '3'
+version: '3.8'
+
 services:
-invest-app:
-build: .
-ports:
-- "3000:3000"
-volumes:
-- .:/app
-- /app/node_modules
+  invest-app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    restart: unless-stopped
