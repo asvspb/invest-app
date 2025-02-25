@@ -25,7 +25,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="percent">Годовой процент (%)</label>
-                        <input type="number" class="form-control" id="percent" step="0.1" min="0" required>
+                        <input type="text" class="form-control" id="percent" inputmode="decimal" data-step="0.1"
+                            data-min="0" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -40,7 +41,10 @@
                     <label class="form-check-label" for="show-how">Показать вычисление</label>
                 </div>
 
-                <button type="button" class="btn btn-primary" onclick="calculateBankProfit()">Рассчитать</button>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="calculateBankProfit()">Рассчитать</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearBankForm()">Очистить</button>
+                </div>
             </form>
             <div class="result" id="result">
                 <h2>Общая прибыль: <span id="profit">0 ₽</span></h2>
@@ -66,7 +70,10 @@
                 <input type="text" class="form-control" id="retail-rate" pattern="[0-9]*" inputmode="numeric">
             </div>
         </div>
-        <button class="clicker" onclick="calculateRetail()">Рассчитать</button>
+        <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="calculateRetail()">Рассчитать</button>
+            <button type="button" class="btn btn-secondary" onclick="clearRetailForm()">Очистить</button>
+        </div>
         <div class="result" id="result">
             <h2>Процент дохода: <span id="retail-profit">0 %</span></h2>
             <p>Прибыль за год: <span id="retail-yearlyProfit">0 ₽</span></p>

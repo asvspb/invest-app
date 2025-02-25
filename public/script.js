@@ -186,6 +186,29 @@ function calculateRetail() {
 }
 
 // Инициализация калькуляторов при загрузке страницы
+// Функции очистки форм
+function clearBankForm() {
+    document.getElementById('amount').value = '0';
+    document.getElementById('period').value = '12';
+    document.getElementById('percent').value = '10';
+    document.getElementById('monthly-deposit').value = '0';
+    document.getElementById('reinvest').checked = false;
+    document.getElementById('show-how').checked = false;
+    document.getElementById('profit').textContent = '0 ₽';
+    document.getElementById('monthlyProfit').textContent = '0 ₽';
+    document.getElementById('yearlyProfit').textContent = '0 ₽';
+    document.getElementById('total').textContent = '0 ₽';
+}
+
+function clearRetailForm() {
+    document.getElementById('retail-initial').value = '0';
+    document.getElementById('retail-period').value = '1';
+    document.getElementById('retail-rate').value = '0';
+    document.getElementById('retail-profit').textContent = '0 %';
+    document.getElementById('retail-yearlyProfit').textContent = '0 ₽';
+    document.getElementById('retail-total').textContent = '0 ₽';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize input fields with default values
     const amountInputs = [
@@ -207,6 +230,50 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    // Special handling for percent input
+    const percentInput = document.getElementById('percent');
+    if (percentInput) {
+        percentInput.value = '10';
+
+        // Handle keyboard input
+        percentInput.addEventListener('input', (e) => {
+            // Replace comma with period for consistency
+            let value = e.target.value.replace(',', '.');
+            // Remove any non-digit characters except the decimal point
+            value = value.replace(/[^\d.]/g, '');
+            // Ensure only one decimal point
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            e.target.value = value;
+        });
+
+        // Handle step increment/decrement
+        percentInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                const step = parseFloat(percentInput.dataset.step) || 0.1;
+                const min = parseFloat(percentInput.dataset.min) || 0;
+                let currentValue = parseFloat(percentInput.value) || 0;
+
+                if (e.key === 'ArrowUp') {
+                    currentValue += step;
+                } else {
+                    currentValue = Math.max(min, currentValue - step);
+                }
+
+                percentInput.value = currentValue.toFixed(1);
+            }
+        });
+
+        percentInput.addEventListener('blur', () => {
+            if (percentInput.value === '' || percentInput.value === '.') {
+                percentInput.value = '0';
+            }
+        });
+    }
 
     // Initialize other inputs with defaults
     const defaultInputs = [
