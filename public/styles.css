@@ -24,7 +24,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.01);
     width: 100%;
     max-width: 450px;
-    min-height: 820px;
+    min-height: 830px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
