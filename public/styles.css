@@ -130,7 +130,7 @@ form .button-group {
 }
 
 .calculator-container > .button-group {
-    margin-top: 91px;
+    margin-top: 70px;
 }
 
 .btn {
@@ -290,4 +290,8 @@ form .button-group {
     border-radius: 12px;
     font-size: 0.95rem;
     line-height: 1.6;
+}
+
+.profit-input {
+    margin-top: 50px;
 }
