@@ -22,12 +22,51 @@
 
 ## Как развернуть приложение
 
-1. Убедитесь, что у вас установлен Docker.
+1. Убедитесь, что у вас установлен Docker:
+   - Для Windows/Mac: установите Docker Desktop
+   - Для Linux: установите Docker Engine и Docker Compose
 
-2. Клонируйте докер-репозиторий:
-   `docker pull asvspb/invest-app:latest`
+2. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/asvspb/invest-app.git
+   cd invest-app
+   ```
 
-3. Запустите контейнер:
-    `docker run -d -p 8585:3000 invest-app`
+3. Соберите образ локально:
+   ```bash
+   docker build -t invest-app .
+   ```
 
-4. Откройте браузер и перейдите по адресу `http://localhost:8585`
+   Или загрузите готовый образ:
+   ```bash
+   docker pull asvspb/invest-app:latest
+   ```
+
+4. Запустите контейнер:
+   ```bash
+   docker run -d -p 3000:3000 --name invest-calculator invest-app
+   ```
+
+5. Откройте браузер и перейдите по адресу `http://localhost:3000`
+
+### Дополнительные команды Docker
+
+- Остановить контейнер:
+  ```bash
+  docker stop invest-calculator
+  ```
+
+- Запустить существующий контейнер:
+  ```bash
+  docker start invest-calculator
+  ```
+
+- Удалить контейнер:
+  ```bash
+  docker rm invest-calculator
+  ```
+
+- Просмотр логов:
+  ```bash
+  docker logs invest-calculator
+  ```
