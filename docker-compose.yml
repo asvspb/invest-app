@@ -3,6 +3,8 @@ version: '3.8'
 services:
   invest-app:
     build: .
+    container_name: invest-app
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
