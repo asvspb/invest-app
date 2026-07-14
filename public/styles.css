@@ -24,7 +24,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.01);
     width: 100%;
     max-width: 450px;
-    min-height: 830px;
+    min-height: 1350px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -188,6 +188,60 @@ form .button-group {
     justify-content: space-between;
 }
 
+.result-divider {
+    border: none;
+    border-top: 1px dashed #cbd5e0;
+    margin: 1rem 0;
+}
+
+.deposit-title,
+.tax-title {
+    color: #2d3748;
+    font-size: 1.05rem;
+    margin: 0.75rem 0 0.5rem;
+    font-weight: 600;
+}
+
+.deposit-highlight {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, #ebf4ff 0%, #e6f0ff 100%);
+    border-radius: 10px;
+    border-left: 4px solid #3182ce;
+}
+
+.deposit-detail {
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 0.35rem 0;
+    padding-left: 0.75rem;
+}
+
+.tax-info {
+    color: #4a5568;
+    font-size: 0.95rem;
+    margin: 0.45rem 0;
+}
+
+.tax-highlight {
+    color: #c53030;
+    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border-radius: 8px;
+    border-left: 3px solid #c53030;
+}
+
+.final-deposit {
+    background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    border-left-color: #38a169;
+    color: #22543d;
+    font-size: 1.15rem;
+    margin-top: 0.75rem;
+}
+
 .clicker {
     margin-top: 2rem;
 }
@@ -290,6 +344,37 @@ form .button-group {
     border-radius: 12px;
     font-size: 0.95rem;
     line-height: 1.6;
+}
+
+.input-with-btn {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.input-with-btn input[type="text"] {
+    flex: 1;
+}
+
+.btn-fetch {
+    flex-shrink: 0;
+    width: 48px;
+    padding: 0.75rem 0.25rem;
+    font-size: 1.3rem;
+    background: linear-gradient(to right, #805ad5, #6b46c1);
+    box-shadow: 0 4px 6px rgba(128,90,213,0.12);
+    border-radius: 12px;
+}
+
+.btn-fetch:hover {
+    background: linear-gradient(to right, #6b46c1, #553c9a);
+    box-shadow: 0 6px 8px rgba(128,90,213,0.18);
+    transform: translateY(-1px);
+}
+
+.btn-fetch.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .profit-input {

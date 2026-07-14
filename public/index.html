@@ -30,6 +30,14 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="cbr-rate">Ключевая ставка ЦБ (%)</label>
+                    <div class="input-with-btn">
+                        <input type="text" class="form-control" id="cbr-rate" inputmode="decimal" data-step="0.1"
+                            data-min="0">
+                        <button type="button" class="btn btn-fetch" id="fetch-cbr-rate" onclick="fetchCbrRate()">↻</button>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="monthly-deposit">Пополнение вклада</label>
                     <input type="text" class="form-control" id="monthly-deposit" pattern="[0-9]*" inputmode="numeric"
                         required>
@@ -48,9 +56,20 @@
             </form>
             <div class="result" id="result">
                 <h2>Общая прибыль: <span id="profit">0 ₽</span></h2>
-                <h2>Прибыль в месяц: <span id="monthlyProfit">0 ₽</span></h2>
+                <p>Прибыль в месяц: <span id="monthlyProfit">0 ₽</span></p>
                 <p>Прибыль за год: <span id="yearlyProfit">0 ₽</span></p>
-                <p>Итоговая сумма: <span id="total">0 ₽</span></p>
+                <hr class="result-divider">
+                <h3 class="deposit-title">Итоговый депозит</h3>
+                <p class="deposit-highlight">Сумма депозита: <span id="totalDeposit">0 ₽</span></p>
+                <p class="deposit-detail">Начальный вклад: <span id="initialDeposit">0 ₽</span></p>
+                <p class="deposit-detail">Пополнения: <span id="totalDeposits">0 ₽</span></p>
+                <p class="deposit-detail">Начисленные %%: <span id="totalInterest">0 ₽</span></p>
+                <hr class="result-divider">
+                <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
+                <p class="tax-info">Необлагаемый лимит: <span id="taxFreeLimit">0 ₽</span></p>
+                <p class="tax-info">Облагаемая сумма: <span id="taxableAmount">0 ₽</span></p>
+                <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="taxAmount">0 ₽</span></p>
+                <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="finalDeposit">0 ₽</span></p>
             </div>
         </div>
     </div>
@@ -69,6 +88,14 @@
                 <label class="profit-input" "retail-rate">Полученная прибыль</label>
                 <input type="text" class="form-control" id="retail-rate" pattern="[0-9]*" inputmode="numeric">
             </div>
+            <div class="form-group">
+                <label for="retail-cbr-rate">Ключевая ставка ЦБ (%)</label>
+                <div class="input-with-btn">
+                    <input type="text" class="form-control" id="retail-cbr-rate" inputmode="decimal" data-step="0.1"
+                        data-min="0">
+                    <button type="button" class="btn btn-fetch" onclick="fetchCbrRate('retail-cbr-rate')">↻</button>
+                </div>
+            </div>
         </div>
         <div class="button-group">
             <button type="button" class="btn btn-primary" onclick="calculateRetail()">Рассчитать</button>
@@ -78,6 +105,12 @@
             <h2>Процент дохода: <span id="retail-profit">0 %</span></h2>
             <p>Прибыль за год: <span id="retail-yearlyProfit">0 ₽</span></p>
             <p>Итоговая сумма: <span id="retail-total">0 ₽</span></p>
+            <hr class="result-divider">
+            <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
+            <p class="tax-info">Необлагаемый лимит: <span id="retail-taxFreeLimit">0 ₽</span></p>
+            <p class="tax-info">Облагаемая сумма: <span id="retail-taxableAmount">0 ₽</span></p>
+            <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="retail-taxAmount">0 ₽</span></p>
+            <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="retail-finalDeposit">0 ₽</span></p>
         </div>
     </div>
     </div>
