@@ -14,6 +14,34 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, "public")));
 
 /**
+ * Proxy endpoint for the current CBR key rate.
+ * Fetches from CBR official XML API and returns JSON.
+ * @name get/api/cbr-key-rate
+ * @function
+ */
+app.get("/api/cbr-key-rate", async (req, res) => {
+  try {
+    const cbrRes = await fetch(
+      "https://www.cbr.ru/hd_base/KeyRate/",
+      { headers: { "User-Agent": "Mozilla/5.0" } }
+    );
+    if (!cbrRes.ok) {
+      return res.status(502).json({ error: "CBR API unavailable" });
+    }
+    const html = await cbrRes.text();
+    const match = html.match(/<td>\d{2},\d{2}<\/td>/);
+    if (!match) {
+      return res.status(502).json({ error: "Failed to parse CBR response" });
+    }
+    const rate = parseFloat(match[0].replace(/[^\d.,]/g, "").replace(",", "."));
+    res.json({ rate });
+  } catch (err) {
+    console.error("CBR proxy error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
  * Route to serve the main HTML file.
  * @name get/
  * @function
