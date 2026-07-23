@@ -19,7 +19,6 @@ async function fetchCbrRate() {
         }
     } catch (err) {
         console.error('Failed to fetch CBR rate:', err);
-        alert('Не удалось получить ставку ЦБ. Проверьте подключение к интернету.');
     } finally {
         allBtns.forEach(b => { b.classList.remove('loading'); b.textContent = '↻'; });
     }
@@ -130,6 +129,7 @@ function calculateTax(profitByYear, maxBalance, cbrRate) {
 }
 
 function calculateBankProfit() {
+    const messageEl = document.getElementById('profit');
     const initialAmountInput = document.getElementById('amount');
     const periodInput = document.getElementById('period');
     const annualPercentInput = document.getElementById('percent');
@@ -145,25 +145,25 @@ function calculateBankProfit() {
     const showHow = document.getElementById('show-how').checked;
 
     if (isNaN(initialAmount) || initialAmount <= 0) {
-        alert('Пожалуйста, введите корректную сумму инвестирования.');
+        messageEl.textContent = 'Введите корректную сумму';
         initialAmountInput.focus();
         return;
     }
 
     if (isNaN(period) || period <= 0) {
-        alert('Пожалуйста, введите корректный период.');
+        messageEl.textContent = 'Введите корректный период';
         periodInput.focus();
         return;
     }
 
     if (isNaN(annualPercent) || annualPercent < 0) {
-        alert('Пожалуйста, введите корректный годовой процент.');
+        messageEl.textContent = 'Введите корректный годовой процент';
         annualPercentInput.focus();
         return;
     }
 
     if (isNaN(monthlyDeposit) || monthlyDeposit < 0) {
-        alert('Пожалуйста, введите корректное пополнение вклада.');
+        messageEl.textContent = 'Введите корректное пополнение';
         monthlyDepositInput.focus();
         return;
     }
@@ -365,7 +365,7 @@ function fetchCbrRates() {
         })
         .catch(err => {
             console.error('Failed to fetch CBR rates:', err);
-            alert('Не удалось получить котировки ЦБ. Проверьте подключение к интернету.');
+            document.getElementById('currency-cbr-exchange-rate').textContent = 'нет данных';
         })
         .finally(() => {
             btn.classList.remove('loading');
@@ -374,6 +374,7 @@ function fetchCbrRates() {
 }
 
 function calculateCurrency() {
+    const messageEl = document.getElementById('currency-result');
     const amountInput = document.getElementById('currency-amount');
     const sellRateInput = document.getElementById('currency-sell-rate');
     const buyRateInput = document.getElementById('currency-buy-rate');
@@ -387,19 +388,19 @@ function calculateCurrency() {
     const holdPeriod = parseInt(holdPeriodInput.value) || 1;
 
     if (isNaN(amount) || amount <= 0) {
-        alert('Пожалуйста, введите корректную сумму.');
+        messageEl.textContent = 'Введите корректную сумму';
         amountInput.focus();
         return;
     }
 
     if (isNaN(sellRate) || sellRate <= 0) {
-        alert('Пожалуйста, введите корректный курс покупки валюты.');
+        messageEl.textContent = 'Введите корректный курс покупки';
         sellRateInput.focus();
         return;
     }
 
     if (isNaN(buyRate) || buyRate <= 0) {
-        alert('Пожалуйста, введите корректный курс продажи валюты.');
+        messageEl.textContent = 'Введите корректный курс продажи';
         buyRateInput.focus();
         return;
     }
