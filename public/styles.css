@@ -380,3 +380,65 @@ form .button-group {
 .profit-input {
     margin-top: 50px;
 }
+
+.field-hint {
+    display: block;
+    margin-top: 0.35rem;
+    color: #a0aec0;
+    font-size: 0.8rem;
+}
+
+.profit-positive {
+    color: #38a169;
+}
+
+.profit-negative {
+    color: #c53030;
+}
+
+.invest-currency,
+.invest-metal {
+    padding-top: 0.5rem;
+}
+
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 2.5rem;
+    padding-left: 1rem;
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #2d3748;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.form-select:hover {
+    border-color: #cbd5e0;
+}
+
+.form-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66,153,225,0.15);
+    outline: none;
+}
+
+.form-select option {
+    background: #ffffff;
+    color: #2d3748;
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+
+.input-with-btn select.form-select {
+    flex: 1;
+    padding-top: 0.875rem;
+    padding-bottom: 0.875rem;
+    height: auto;
+}

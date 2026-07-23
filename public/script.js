@@ -1,20 +1,19 @@
-async function fetchCbrRate(targetId) {
-    const id = targetId || 'cbr-rate';
-    const btn = document.getElementById(id).parentElement.querySelector('.btn-fetch');
-    const input = document.getElementById(id);
+const CBR_RATE_INPUTS = ['cbr-rate', 'retail-cbr-rate', 'currency-cbr-rate', 'metal-cbr-rate'];
 
-    if (btn) {
-        btn.classList.add('loading');
-        btn.textContent = '...';
-    }
+async function fetchCbrRate() {
+    const allBtns = document.querySelectorAll('.btn-fetch-cbr');
+    allBtns.forEach(b => { b.classList.add('loading'); b.textContent = '...'; });
 
     try {
-        const resp = await fetch('/api/cbr-key-rate');
+        const resp = await fetch('/api/cbr-key-rate?refresh=true');
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         const rate = parseFloat(data.rate);
         if (!isNaN(rate)) {
-            input.value = rate.toFixed(1);
+            CBR_RATE_INPUTS.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = rate.toFixed(1);
+            });
         } else {
             throw new Error('Invalid rate value');
         }
@@ -22,10 +21,7 @@ async function fetchCbrRate(targetId) {
         console.error('Failed to fetch CBR rate:', err);
         alert('Не удалось получить ставку ЦБ. Проверьте подключение к интернету.');
     } finally {
-        if (btn) {
-            btn.classList.remove('loading');
-            btn.textContent = '↻';
-        }
+        allBtns.forEach(b => { b.classList.remove('loading'); b.textContent = '↻'; });
     }
 }
 
@@ -247,55 +243,357 @@ function calculateBankProfit() {
 }
 
 // Ретейл калькулятор
-function calculateRetail() {
-    const initialInput = document.getElementById('retail-initial');
-    const periodInput = document.getElementById('retail-period');
-    const profitInput = document.getElementById('retail-rate');
-    const cbrRateInput = document.getElementById('retail-cbr-rate');
 
-    const initial = parseFormattedNumber(initialInput.value);
+// Чистая функция метрик: число → число, без document.* (AGENTS.md §6.2).
+// Полная экономическая модель: прибыль = выручка − себестоимость − расходы.
+function calculateRetailMetrics(revenue, cost, expenses, period) {
+    const profit = revenue - cost - expenses;
+    const invested = cost + expenses;
+    const markup = cost > 0 ? (profit / cost) * 100 : 0;
+    const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
+    const roi = invested > 0 ? (profit / invested) * 100 : 0;
+    const yearlyYield = period > 0 ? roi * 12 / period : 0;
+    return { profit, invested, markup, margin, roi, yearlyYield };
+}
+
+function calculateRetail() {
+    const revenueInput = document.getElementById('retail-revenue');
+    const costInput = document.getElementById('retail-cost-price');
+    const expensesInput = document.getElementById('retail-expenses');
+    const periodInput = document.getElementById('retail-period');
+    const cbrRateInput = document.getElementById('retail-cbr-rate');
+    const messageEl = document.getElementById('retail-profit-amount');
+
+    const revenue = parseFormattedNumber(revenueInput.value);
+    const cost = parseFormattedNumber(costInput.value);
+    const expenses = parseFormattedNumber(expensesInput.value);
     const period = parseInt(periodInput.value) || 0;
-    const profit = parseFormattedNumber(profitInput.value);
     const cbrRate = parseFloat(cbrRateInput.value) || 21;
 
-    if (isNaN(initial) || initial < 0) {
-        alert('Пожалуйста, введите корректную сумму инвестирования.');
-        initialInput.focus();
+    // Валидация с сообщением в DOM (не alert — AGENTS.md §7).
+    if (isNaN(revenue) || revenue < 0) {
+        messageEl.textContent = 'Введите корректную выручку';
+        revenueInput.focus();
         return;
     }
-
+    if (isNaN(cost) || cost < 0) {
+        messageEl.textContent = 'Введите корректную себестоимость';
+        costInput.focus();
+        return;
+    }
+    if (isNaN(expenses) || expenses < 0) {
+        messageEl.textContent = 'Введите корректные расходы';
+        expensesInput.focus();
+        return;
+    }
     if (isNaN(period) || period <= 0) {
-        alert('Пожалуйста, введите корректный период.');
+        messageEl.textContent = 'Введите корректный период';
         periodInput.focus();
         return;
     }
 
-    if (isNaN(profit) || profit < 0) {
-        alert('Пожалуйста, введите корректную прибыль.');
-        profitInput.focus();
+    const { profit, markup, margin, roi, yearlyYield } =
+        calculateRetailMetrics(revenue, cost, expenses, period);
+
+    // Убыток налогом не облагается (Math.max). maxBalance = вложенный капитал.
+    const taxResult = calculateTax([Math.max(profit, 0)], cost + expenses, cbrRate);
+    const finalAmount = profit - taxResult.taxAmount;
+
+    document.getElementById('retail-profit-amount').textContent = formatNumber(profit) + ' ₽';
+    document.getElementById('retail-markup').textContent = formatDecimal(markup) + ' %';
+    document.getElementById('retail-margin').textContent = formatDecimal(margin) + ' %';
+    document.getElementById('retail-roi').textContent = formatDecimal(roi) + ' %';
+    document.getElementById('retail-yearly-yield').textContent = formatDecimal(yearlyYield) + ' %';
+
+    document.getElementById('retail-detail-revenue').textContent = formatNumber(revenue) + ' ₽';
+    document.getElementById('retail-detail-cost').textContent = formatNumber(cost) + ' ₽';
+    document.getElementById('retail-detail-expenses').textContent = formatNumber(expenses) + ' ₽';
+
+    document.getElementById('retail-taxAmount').textContent = formatNumber(taxResult.taxAmount) + ' ₽';
+    document.getElementById('retail-finalDeposit').textContent = formatNumber(finalAmount) + ' ₽';
+}
+
+let lastCbrExchangeRate = null;
+let lastCbrMetalPrice = null;
+
+function calculateAssetRoundTrip(params) {
+    const { amount, buyPrice, sellPrice, refPrice, keyRate, holdPeriod } = params;
+
+    const units = amount / buyPrice;
+    const rubAfterSell = units * sellPrice;
+    const profit = rubAfterSell - amount;
+
+    const spreadBuy = refPrice > 0 ? buyPrice - refPrice : 0;
+    const spreadSell = refPrice > 0 ? refPrice - sellPrice : 0;
+    const totalSpread = spreadBuy + spreadSell;
+    const marginBuy = refPrice > 0 ? (spreadBuy / refPrice) * 100 : 0;
+    const marginSell = refPrice > 0 ? (spreadSell / refPrice) * 100 : 0;
+    const marginTotal = refPrice > 0 ? (totalSpread / refPrice) * 100 : 0;
+
+    const periodYield = (profit / amount) * 100;
+    const yearlyYield = periodYield * (365 / holdPeriod);
+
+    const tax = calculateTax([Math.max(profit, 0)], amount, keyRate);
+    const finalAmount = rubAfterSell - tax.taxAmount;
+
+    return { units, rubAfterSell, profit, periodYield, yearlyYield,
+             spreadBuy, spreadSell, totalSpread, marginBuy, marginSell, marginTotal,
+             tax, finalAmount };
+}
+
+function fetchCbrRates() {
+    const btn = document.getElementById('fetch-cbr-rates-btn');
+    const code = document.getElementById('currency-code').value;
+    const sellInput = document.getElementById('currency-sell-rate');
+    const buyInput = document.getElementById('currency-buy-rate');
+
+    btn.classList.add('loading');
+    btn.textContent = '...';
+
+    fetch('/api/cbr-rates')
+        .then(resp => {
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return resp.json();
+        })
+        .then(data => {
+            const rate = data.rates[code];
+            if (!rate) throw new Error(`Валюта ${code} не найдена`);
+            lastCbrExchangeRate = rate;
+            sellInput.value = rate.toFixed(2);
+            buyInput.value = rate.toFixed(2);
+            document.getElementById('currency-cbr-exchange-rate').textContent = rate.toFixed(2);
+        })
+        .catch(err => {
+            console.error('Failed to fetch CBR rates:', err);
+            alert('Не удалось получить котировки ЦБ. Проверьте подключение к интернету.');
+        })
+        .finally(() => {
+            btn.classList.remove('loading');
+            btn.textContent = '↻';
+        });
+}
+
+function calculateCurrency() {
+    const amountInput = document.getElementById('currency-amount');
+    const sellRateInput = document.getElementById('currency-sell-rate');
+    const buyRateInput = document.getElementById('currency-buy-rate');
+    const cbrRateInput = document.getElementById('currency-cbr-rate');
+    const holdPeriodInput = document.getElementById('currency-hold-period');
+
+    const amount = parseFormattedNumber(amountInput.value);
+    const sellRate = parseFloat(sellRateInput.value);
+    const buyRate = parseFloat(buyRateInput.value);
+    const cbrRate = parseFloat(cbrRateInput.value) || 21;
+    const holdPeriod = parseInt(holdPeriodInput.value) || 1;
+
+    if (isNaN(amount) || amount <= 0) {
+        alert('Пожалуйста, введите корректную сумму.');
+        amountInput.focus();
         return;
     }
 
-    let total, yearlyProfit;
-
-    if (initial > 0 && period > 0) {
-        total = initial + profit;
-        yearlyProfit = (profit / initial) * (12 / period) * 100;
-    } else {
-        total = yearlyProfit = 0;
+    if (isNaN(sellRate) || sellRate <= 0) {
+        alert('Пожалуйста, введите корректный курс покупки валюты.');
+        sellRateInput.focus();
+        return;
     }
 
-    const taxResult = calculateTax([profit], initial, cbrRate);
-    const finalAmount = total - taxResult.taxAmount;
+    if (isNaN(buyRate) || buyRate <= 0) {
+        alert('Пожалуйста, введите корректный курс продажи валюты.');
+        buyRateInput.focus();
+        return;
+    }
 
-    document.getElementById('retail-profit').textContent = formatNumber(yearlyProfit) + ' %';
-    document.getElementById('retail-yearlyProfit').textContent = formatNumber(profit) + ' ₽';
-    document.getElementById('retail-total').textContent = formatNumber(total) + ' ₽';
+    const r = calculateAssetRoundTrip({
+        amount,
+        buyPrice: sellRate,
+        sellPrice: buyRate,
+        refPrice: lastCbrExchangeRate || 0,
+        keyRate: cbrRate,
+        holdPeriod
+    });
 
-    document.getElementById('retail-taxFreeLimit').textContent = formatNumber(taxResult.yearlyLimit) + ' ₽/год';
-    document.getElementById('retail-taxableAmount').textContent = formatNumber(taxResult.taxableIncome) + ' ₽';
-    document.getElementById('retail-taxAmount').textContent = formatNumber(taxResult.taxAmount) + ' ₽';
-    document.getElementById('retail-finalDeposit').textContent = formatNumber(finalAmount) + ' ₽';
+    const resultEl = document.getElementById('currency-result');
+    resultEl.textContent = (r.profit >= 0 ? '+' : '') + formatNumber(r.profit) + ' ₽';
+    resultEl.className = r.profit >= 0 ? 'profit-positive' : 'profit-negative';
+
+    document.getElementById('currency-bought').textContent = formatDecimal(r.units);
+    document.getElementById('currency-sold-rub').textContent = formatNumber(r.rubAfterSell) + ' ₽';
+
+    const periodYieldEl = document.getElementById('currency-period-yield');
+    const yearlyYieldEl = document.getElementById('currency-yearly-yield');
+    periodYieldEl.textContent = formatDecimal(r.periodYield) + ' %';
+    periodYieldEl.className = r.periodYield >= 0 ? 'profit-positive' : 'profit-negative';
+    yearlyYieldEl.textContent = formatDecimal(r.yearlyYield) + ' %';
+    yearlyYieldEl.className = r.yearlyYield >= 0 ? 'profit-positive' : 'profit-negative';
+
+    document.getElementById('currency-spread-sell').textContent = (r.spreadBuy >= 0 ? '+' : '') + formatDecimal(r.spreadBuy) + ' ₽';
+    document.getElementById('currency-margin-sell').textContent = formatDecimal(r.marginBuy) + ' %';
+    document.getElementById('currency-spread-buy').textContent = (r.spreadSell >= 0 ? '+' : '') + formatDecimal(r.spreadSell) + ' ₽';
+    document.getElementById('currency-margin-buy').textContent = formatDecimal(r.marginSell) + ' %';
+    document.getElementById('currency-spread').textContent = formatDecimal(r.totalSpread) + ' ₽';
+    document.getElementById('currency-margin').textContent = formatDecimal(r.marginTotal) + ' %';
+
+    document.getElementById('currency-taxFreeLimit').textContent = formatNumber(r.tax.yearlyLimit) + ' ₽/год';
+    document.getElementById('currency-taxableAmount').textContent = formatNumber(r.tax.taxableIncome) + ' ₽';
+    document.getElementById('currency-taxAmount').textContent = formatNumber(r.tax.taxAmount) + ' ₽';
+    document.getElementById('currency-finalDeposit').textContent = formatNumber(r.finalAmount) + ' ₽';
+}
+
+function clearCurrencyForm() {
+    document.getElementById('currency-amount').value = '0';
+    document.getElementById('currency-sell-rate').value = '0';
+    document.getElementById('currency-buy-rate').value = '0';
+    document.getElementById('currency-cbr-rate').value = '21';
+    document.getElementById('currency-hold-period').value = '1';
+    document.getElementById('currency-result').textContent = '0 ₽';
+    document.getElementById('currency-result').className = '';
+    document.getElementById('currency-bought').textContent = '0';
+    document.getElementById('currency-sold-rub').textContent = '0 ₽';
+    document.getElementById('currency-period-yield').textContent = '0 %';
+    document.getElementById('currency-period-yield').className = '';
+    document.getElementById('currency-yearly-yield').textContent = '0 %';
+    document.getElementById('currency-yearly-yield').className = '';
+    document.getElementById('currency-spread-sell').textContent = '0 ₽';
+    document.getElementById('currency-margin-sell').textContent = '0 %';
+    document.getElementById('currency-spread-buy').textContent = '0 ₽';
+    document.getElementById('currency-margin-buy').textContent = '0 %';
+    document.getElementById('currency-spread').textContent = '0 ₽';
+    document.getElementById('currency-margin').textContent = '0 %';
+    document.getElementById('currency-taxFreeLimit').textContent = '0 ₽/год';
+    document.getElementById('currency-taxableAmount').textContent = '0 ₽';
+    document.getElementById('currency-taxAmount').textContent = '0 ₽';
+    document.getElementById('currency-finalDeposit').textContent = '0 ₽';
+}
+
+function fetchCbrMetals() {
+    const btn = document.getElementById('metal-fetch-btn');
+    const metalType = document.getElementById('metal-type').value;
+    const buyInput = document.getElementById('metal-buy-price');
+    const sellInput = document.getElementById('metal-sell-price');
+    const cbrPriceSpan = document.getElementById('metal-cbr-price');
+
+    btn.classList.add('loading');
+    btn.textContent = '...';
+
+    fetch('/api/cbr-metals')
+        .then(resp => {
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return resp.json();
+        })
+        .then(data => {
+            const price = data.metals[metalType];
+            if (!price) throw new Error(`Металл ${metalType} не найден`);
+            lastCbrMetalPrice = price;
+            buyInput.value = price.toFixed(2);
+            sellInput.value = price.toFixed(2);
+            cbrPriceSpan.textContent = price.toFixed(2);
+        })
+        .catch(err => {
+            console.error('Failed to fetch CBR metals:', err);
+            cbrPriceSpan.textContent = 'нет данных';
+        })
+        .finally(() => {
+            btn.classList.remove('loading');
+            btn.textContent = '↻';
+        });
+}
+
+function calculateMetal() {
+    const amountInput = document.getElementById('metal-amount');
+    const buyPriceInput = document.getElementById('metal-buy-price');
+    const sellPriceInput = document.getElementById('metal-sell-price');
+    const cbrRateInput = document.getElementById('metal-cbr-rate');
+    const holdPeriodInput = document.getElementById('metal-hold-period');
+    const messageEl = document.getElementById('metal-result');
+
+    const amount = parseFormattedNumber(amountInput.value);
+    const buyPrice = parseFloat(buyPriceInput.value);
+    const sellPrice = parseFloat(sellPriceInput.value);
+    const cbrRate = parseFloat(cbrRateInput.value) || 21;
+    const holdPeriod = parseInt(holdPeriodInput.value) || 0;
+
+    if (isNaN(amount) || amount <= 0) {
+        messageEl.textContent = 'Введите корректную сумму';
+        amountInput.focus();
+        return;
+    }
+    if (isNaN(buyPrice) || buyPrice <= 0) {
+        messageEl.textContent = 'Введите корректную цену покупки';
+        buyPriceInput.focus();
+        return;
+    }
+    if (isNaN(sellPrice) || sellPrice <= 0) {
+        messageEl.textContent = 'Введите корректную цену продажи';
+        sellPriceInput.focus();
+        return;
+    }
+    if (isNaN(holdPeriod) || holdPeriod <= 0) {
+        messageEl.textContent = 'Введите корректный период владения';
+        holdPeriodInput.focus();
+        return;
+    }
+
+    const r = calculateAssetRoundTrip({
+        amount,
+        buyPrice,
+        sellPrice,
+        refPrice: lastCbrMetalPrice || 0,
+        keyRate: cbrRate,
+        holdPeriod
+    });
+
+    const resultEl = document.getElementById('metal-result');
+    resultEl.textContent = (r.profit >= 0 ? '+' : '') + formatNumber(r.profit) + ' ₽';
+    resultEl.className = r.profit >= 0 ? 'profit-positive' : 'profit-negative';
+
+    document.getElementById('metal-bought').textContent = formatDecimal(r.units);
+    document.getElementById('metal-sold-rub').textContent = formatNumber(r.rubAfterSell) + ' ₽';
+
+    const periodYieldEl = document.getElementById('metal-period-yield');
+    const yearlyYieldEl = document.getElementById('metal-yearly-yield');
+    periodYieldEl.textContent = formatDecimal(r.periodYield) + ' %';
+    periodYieldEl.className = r.periodYield >= 0 ? 'profit-positive' : 'profit-negative';
+    yearlyYieldEl.textContent = formatDecimal(r.yearlyYield) + ' %';
+    yearlyYieldEl.className = r.yearlyYield >= 0 ? 'profit-positive' : 'profit-negative';
+
+    document.getElementById('metal-spread-buy').textContent = formatDecimal(r.spreadBuy) + ' ₽';
+    document.getElementById('metal-margin-buy').textContent = formatDecimal(r.marginBuy) + ' %';
+    document.getElementById('metal-spread-sell').textContent = formatDecimal(r.spreadSell) + ' ₽';
+    document.getElementById('metal-margin-sell').textContent = formatDecimal(r.marginSell) + ' %';
+    document.getElementById('metal-spread').textContent = formatDecimal(r.totalSpread) + ' ₽';
+    document.getElementById('metal-margin').textContent = formatDecimal(r.marginTotal) + ' %';
+
+    document.getElementById('metal-taxFreeLimit').textContent = formatNumber(r.tax.yearlyLimit) + ' ₽/год';
+    document.getElementById('metal-taxableAmount').textContent = formatNumber(r.tax.taxableIncome) + ' ₽';
+    document.getElementById('metal-taxAmount').textContent = formatNumber(r.tax.taxAmount) + ' ₽';
+    document.getElementById('metal-finalDeposit').textContent = formatNumber(r.finalAmount) + ' ₽';
+}
+
+function clearMetalForm() {
+    document.getElementById('metal-amount').value = '0';
+    document.getElementById('metal-buy-price').value = '0';
+    document.getElementById('metal-sell-price').value = '0';
+    document.getElementById('metal-cbr-rate').value = '21';
+    document.getElementById('metal-hold-period').value = '365';
+    document.getElementById('metal-result').textContent = '0 ₽';
+    document.getElementById('metal-result').className = '';
+    document.getElementById('metal-bought').textContent = '0';
+    document.getElementById('metal-sold-rub').textContent = '0 ₽';
+    document.getElementById('metal-period-yield').textContent = '0 %';
+    document.getElementById('metal-period-yield').className = '';
+    document.getElementById('metal-yearly-yield').textContent = '0 %';
+    document.getElementById('metal-yearly-yield').className = '';
+    document.getElementById('metal-spread-buy').textContent = '0 ₽';
+    document.getElementById('metal-margin-buy').textContent = '0 %';
+    document.getElementById('metal-spread-sell').textContent = '0 ₽';
+    document.getElementById('metal-margin-sell').textContent = '0 %';
+    document.getElementById('metal-spread').textContent = '0 ₽';
+    document.getElementById('metal-margin').textContent = '0 %';
+    document.getElementById('metal-taxFreeLimit').textContent = '0 ₽/год';
+    document.getElementById('metal-taxableAmount').textContent = '0 ₽';
+    document.getElementById('metal-taxAmount').textContent = '0 ₽';
+    document.getElementById('metal-finalDeposit').textContent = '0 ₽';
 }
 
 // Инициализация калькуляторов при загрузке страницы
@@ -322,15 +620,19 @@ function clearBankForm() {
 }
 
 function clearRetailForm() {
-    document.getElementById('retail-initial').value = '0';
+    document.getElementById('retail-revenue').value = '0';
+    document.getElementById('retail-cost-price').value = '0';
+    document.getElementById('retail-expenses').value = '0';
     document.getElementById('retail-period').value = '1';
-    document.getElementById('retail-rate').value = '0';
     document.getElementById('retail-cbr-rate').value = '21';
-    document.getElementById('retail-profit').textContent = '0 %';
-    document.getElementById('retail-yearlyProfit').textContent = '0 ₽';
-    document.getElementById('retail-total').textContent = '0 ₽';
-    document.getElementById('retail-taxFreeLimit').textContent = '0 ₽/год';
-    document.getElementById('retail-taxableAmount').textContent = '0 ₽';
+    document.getElementById('retail-profit-amount').textContent = '0 ₽';
+    document.getElementById('retail-markup').textContent = '0 %';
+    document.getElementById('retail-margin').textContent = '0 %';
+    document.getElementById('retail-roi').textContent = '0 %';
+    document.getElementById('retail-yearly-yield').textContent = '0 %';
+    document.getElementById('retail-detail-revenue').textContent = '0 ₽';
+    document.getElementById('retail-detail-cost').textContent = '0 ₽';
+    document.getElementById('retail-detail-expenses').textContent = '0 ₽';
     document.getElementById('retail-taxAmount').textContent = '0 ₽';
     document.getElementById('retail-finalDeposit').textContent = '0 ₽';
 }
@@ -339,9 +641,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize input fields with default values
     const amountInputs = [
         document.getElementById('amount'),
-        document.getElementById('retail-initial'),
+        document.getElementById('retail-revenue'),
+        document.getElementById('retail-cost-price'),
+        document.getElementById('retail-expenses'),
         document.getElementById('monthly-deposit'),
-        document.getElementById('retail-rate')
+        document.getElementById('currency-amount'),
+        document.getElementById('metal-amount')
     ];
 
     // Set default values and add input formatting
@@ -358,10 +663,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Special handling for percent inputs (percent + cbr-rate)
-    [document.getElementById('percent'), document.getElementById('cbr-rate'), document.getElementById('retail-cbr-rate')].forEach(percentInput => {
+    [document.getElementById('percent'), document.getElementById('cbr-rate'), document.getElementById('retail-cbr-rate'), document.getElementById('currency-sell-rate'), document.getElementById('currency-buy-rate'), document.getElementById('currency-cbr-rate'), document.getElementById('metal-buy-price'), document.getElementById('metal-sell-price'), document.getElementById('metal-cbr-rate')].forEach(percentInput => {
         if (percentInput) {
             const isCbr = percentInput.id.includes('cbr-rate');
-            percentInput.value = isCbr ? '21' : (percentInput.id === 'cbr-rate' ? '21' : '10');
+            const isMetalPrice = percentInput.id === 'metal-buy-price' || percentInput.id === 'metal-sell-price';
+            percentInput.value = isCbr ? '21' : isMetalPrice ? '0' : (percentInput.id === 'cbr-rate' ? '21' : '10');
 
             percentInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(',', '.');
@@ -401,7 +707,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize other inputs with defaults
     const defaultInputs = [
         { id: 'retail-period', value: '1' },
-        { id: 'retail-rate', value: '0' }
+        { id: 'retail-rate', value: '0' },
+        { id: 'metal-hold-period', value: '365' }
     ];
 
     defaultInputs.forEach(({ id, value }) => {
@@ -410,4 +717,21 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = value;
         }
     });
+
+    CBR_RATE_INPUTS.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                const val = input.value;
+                CBR_RATE_INPUTS.forEach(otherId => {
+                    if (otherId !== id) {
+                        const other = document.getElementById(otherId);
+                        if (other) other.value = val;
+                    }
+                });
+            });
+        }
+    });
+
+    fetchCbrRate();
 });

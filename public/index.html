@@ -34,7 +34,7 @@
                     <div class="input-with-btn">
                         <input type="text" class="form-control" id="cbr-rate" inputmode="decimal" data-step="0.1"
                             data-min="0">
-                        <button type="button" class="btn btn-fetch" id="fetch-cbr-rate" onclick="fetchCbrRate()">↻</button>
+                        <button type="button" class="btn btn-fetch btn-fetch-cbr" id="fetch-cbr-rate" onclick="fetchCbrRate()">↻</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -77,24 +77,29 @@
         <div class="invest-retail">
             <h1>Ретейл калькулятор</h1>
             <div class="form-group">
-                <label for="retail-initial">Сумма инвестирования (₽)</label>
-                <input type="text" class="form-control" id="retail-initial" pattern="[0-9]*" inputmode="numeric">
+                <label for="retail-revenue">Выручка (₽)</label>
+                <input type="text" class="form-control" id="retail-revenue" pattern="[0-9]*" inputmode="numeric">
             </div>
             <div class="form-group">
-                <label for="retail-period">Период (месяцов)</label>
-                <input type="number" class="form-control" id="retail-period" min="1">
+                <label for="retail-cost-price">Себестоимость (₽)</label>
+                <input type="text" class="form-control" id="retail-cost-price" pattern="[0-9]*" inputmode="numeric">
             </div>
             <div class="form-group">
-                <label class="profit-input" "retail-rate">Полученная прибыль</label>
-                <input type="text" class="form-control" id="retail-rate" pattern="[0-9]*" inputmode="numeric">
+                <label for="retail-expenses">Расходы (₽)</label>
+                <input type="text" class="form-control" id="retail-expenses" pattern="[0-9]*" inputmode="numeric">
+                <small class="field-hint">Аренда, реклама, логистика и т.д.</small>
             </div>
             <div class="form-group">
                 <label for="retail-cbr-rate">Ключевая ставка ЦБ (%)</label>
                 <div class="input-with-btn">
                     <input type="text" class="form-control" id="retail-cbr-rate" inputmode="decimal" data-step="0.1"
                         data-min="0">
-                    <button type="button" class="btn btn-fetch" onclick="fetchCbrRate('retail-cbr-rate')">↻</button>
+                    <button type="button" class="btn btn-fetch btn-fetch-cbr" id="retail-fetch-cbr-rate" onclick="fetchCbrRate()">↻</button>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="retail-period">Период (месяцев)</label>
+                <input type="number" class="form-control" id="retail-period" min="1" value="1">
             </div>
         </div>
         <div class="button-group">
@@ -102,17 +107,150 @@
             <button type="button" class="btn btn-secondary" onclick="clearRetailForm()">Очистить</button>
         </div>
         <div class="result" id="result">
-            <h2>Процент дохода: <span id="retail-profit">0 %</span></h2>
-            <p>Прибыль за год: <span id="retail-yearlyProfit">0 ₽</span></p>
-            <p>Итоговая сумма: <span id="retail-total">0 ₽</span></p>
+            <h2>Прибыль: <span id="retail-profit-amount">0 ₽</span></h2>
+            <p>Наценка: <span id="retail-markup">0 %</span></p>
+            <p>Маржа: <span id="retail-margin">0 %</span></p>
+            <p>Рентабельность: <span id="retail-roi">0 %</span></p>
+            <p>Годовая доходность: <span id="retail-yearly-yield">0 %</span></p>
             <hr class="result-divider">
-            <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
-            <p class="tax-info">Необлагаемый лимит: <span id="retail-taxFreeLimit">0 ₽</span></p>
-            <p class="tax-info">Облагаемая сумма: <span id="retail-taxableAmount">0 ₽</span></p>
-            <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="retail-taxAmount">0 ₽</span></p>
+            <h3 class="deposit-title">Детализация</h3>
+            <p class="deposit-detail">Выручка: <span id="retail-detail-revenue">0 ₽</span></p>
+            <p class="deposit-detail">Себестоимость: <span id="retail-detail-cost">0 ₽</span></p>
+            <p class="deposit-detail">Расходы: <span id="retail-detail-expenses">0 ₽</span></p>
+            <hr class="result-divider">
+            <h3 class="tax-title">Налогообложение (НДФЛ 13%)</h3>
+            <p class="tax-info tax-highlight">Налог к уплате: <span id="retail-taxAmount">0 ₽</span></p>
             <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="retail-finalDeposit">0 ₽</span></p>
         </div>
     </div>
+    </div>
+    <div class="calculator-container">
+        <div class="invest-currency">
+            <h1>Калькулятор валюты</h1>
+            <div class="form-group">
+                <label for="currency-code">Валюта</label>
+                <div class="input-with-btn">
+                    <select id="currency-code" class="form-control form-select">
+                        <option value="USD">USD — Доллар США</option>
+                        <option value="EUR">EUR — Евро</option>
+                        <option value="CNY">CNY — Китайский юань</option>
+                        <option value="GBP">GBP — Фунт стерлингов</option>
+                        <option value="TRY">TRY — Турецкая лира</option>
+                        <option value="KZT">KZT — Тенге</option>
+                    </select>
+                    <button type="button" class="btn btn-fetch" id="fetch-cbr-rates-btn" onclick="fetchCbrRates()">↻</button>
+                </div>
+                <small class="field-hint">Курс ЦБ: <span id="currency-cbr-exchange-rate">—</span> ₽</small>
+            </div>
+            <div class="form-group">
+                <label for="currency-amount">Сумма в рублях (₽)</label>
+                <input type="text" class="form-control" id="currency-amount" pattern="[0-9]*" inputmode="numeric">
+            </div>
+            <div class="form-group">
+                <label for="currency-sell-rate">Курс покупки валюты (₽ за ед.)</label>
+                <input type="text" class="form-control" id="currency-sell-rate" inputmode="decimal" data-step="0.01"
+                    data-min="0">
+                <small class="field-hint">Курс, по которому банк продаёт валюту вам</small>
+            </div>
+            <div class="form-group">
+                <label for="currency-buy-rate">Курс продажи валюты (₽ за ед.)</label>
+                <input type="text" class="form-control" id="currency-buy-rate" inputmode="decimal" data-step="0.01"
+                    data-min="0">
+                <small class="field-hint">Курс, по которому банк покупает валюту у вас</small>
+            </div>
+            <div class="form-group">
+                <label for="currency-cbr-rate">Ключевая ставка ЦБ (%)</label>
+                <input type="text" class="form-control" id="currency-cbr-rate" inputmode="decimal" data-step="0.1"
+                    data-min="0">
+            </div>
+            <div class="form-group">
+                <label for="currency-hold-period">Период владения (дней)</label>
+                <input type="number" class="form-control" id="currency-hold-period" min="1" value="1">
+            </div>
+        </div>
+        <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="calculateCurrency()">Рассчитать</button>
+            <button type="button" class="btn btn-secondary" onclick="clearCurrencyForm()">Очистить</button>
+        </div>
+        <div class="result" id="result">
+            <h2>Результат: <span id="currency-result" class="profit-positive">0 ₽</span></h2>
+            <p>Куплено валюты: <span id="currency-bought">0</span></p>
+            <p>Получено ₽ при обратной продаже: <span id="currency-sold-rub">0 ₽</span></p>
+            <p>Доходность за период: <span id="currency-period-yield">0 %</span></p>
+            <p>Годовая доходность: <span id="currency-yearly-yield">0 %</span></p>
+            <hr class="result-divider">
+            <h3 class="deposit-title">Спред банка</h3>
+            <p>Спред покупки: <span id="currency-spread-sell">0 ₽</span> <span id="currency-margin-sell" class="spread-pct">0 %</span></p>
+            <p>Спред продажи: <span id="currency-spread-buy">0 ₽</span> <span id="currency-margin-buy" class="spread-pct">0 %</span></p>
+            <p>Общий спред: <span id="currency-spread">0 ₽</span> <span id="currency-margin" class="spread-pct">0 %</span></p>
+            <hr class="result-divider">
+            <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
+            <p class="tax-info">Необлагаемый лимит: <span id="currency-taxFreeLimit">0 ₽</span></p>
+            <p class="tax-info">Облагаемая сумма: <span id="currency-taxableAmount">0 ₽</span></p>
+            <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="currency-taxAmount">0 ₽</span></p>
+            <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="currency-finalDeposit">0 ₽</span></p>
+        </div>
+    </div>
+    </div>
+    <div class="calculator-container">
+        <div class="invest-metal">
+            <h1>Калькулятор драгметаллов</h1>
+            <div class="form-group">
+                <label for="metal-type">Металл</label>
+                <div class="input-with-btn">
+                    <select id="metal-type" class="form-control form-select">
+                        <option value="Au">Au — Золото</option>
+                        <option value="Ag">Ag — Серебро</option>
+                        <option value="Pt">Pt — Платина</option>
+                        <option value="Pd">Pd — Палладий</option>
+                    </select>
+                    <button type="button" class="btn btn-fetch" id="metal-fetch-btn" onclick="fetchCbrMetals()">↻</button>
+                </div>
+                <small class="field-hint">Цена ЦБ: <span id="metal-cbr-price">—</span> ₽/г</small>
+            </div>
+            <div class="form-group">
+                <label for="metal-amount">Сумма в рублях (₽)</label>
+                <input type="text" class="form-control" id="metal-amount" pattern="[0-9]*" inputmode="numeric">
+            </div>
+            <div class="form-group">
+                <label for="metal-buy-price">Цена покупки (₽/г)</label>
+                <input type="text" class="form-control" id="metal-buy-price" inputmode="decimal" data-step="0.01" data-min="0">
+            </div>
+            <div class="form-group">
+                <label for="metal-sell-price">Цена продажи (₽/г)</label>
+                <input type="text" class="form-control" id="metal-sell-price" inputmode="decimal" data-step="0.01" data-min="0">
+            </div>
+            <div class="form-group">
+                <label for="metal-cbr-rate">Ключевая ставка ЦБ (%)</label>
+                <input type="text" class="form-control" id="metal-cbr-rate" inputmode="decimal" data-step="0.1" data-min="0">
+            </div>
+            <div class="form-group">
+                <label for="metal-hold-period">Период владения (дней)</label>
+                <input type="number" class="form-control" id="metal-hold-period" min="1" value="365">
+            </div>
+        </div>
+        <div class="button-group">
+            <button type="button" class="btn btn-primary" onclick="calculateMetal()">Рассчитать</button>
+            <button type="button" class="btn btn-secondary" onclick="clearMetalForm()">Очистить</button>
+        </div>
+        <div class="result">
+            <h2>Результат: <span id="metal-result" class="profit-positive">0 ₽</span></h2>
+            <p>Куплено грамм: <span id="metal-bought">0</span></p>
+            <p>Получено ₽ при продаже: <span id="metal-sold-rub">0 ₽</span></p>
+            <p>Доходность за период: <span id="metal-period-yield">0 %</span></p>
+            <p>Годовая доходность: <span id="metal-yearly-yield">0 %</span></p>
+            <hr class="result-divider">
+            <h3 class="deposit-title">Спред банка</h3>
+            <p>Спред при покупке: <span id="metal-spread-buy">0 ₽</span> <span id="metal-margin-buy" class="spread-pct">0 %</span></p>
+            <p>Спред при продаже: <span id="metal-spread-sell">0 ₽</span> <span id="metal-margin-sell" class="spread-pct">0 %</span></p>
+            <p>Общий спред: <span id="metal-spread">0 ₽</span> <span id="metal-margin" class="spread-pct">0 %</span></p>
+            <hr class="result-divider">
+            <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
+            <p class="tax-info">Необлагаемый лимит: <span id="metal-taxFreeLimit">0 ₽</span></p>
+            <p class="tax-info">Облагаемая сумма: <span id="metal-taxableAmount">0 ₽</span></p>
+            <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="metal-taxAmount">0 ₽</span></p>
+            <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="metal-finalDeposit">0 ₽</span></p>
+        </div>
     </div>
     <script src="script.js"></script>
     <div id="calculationModal" class="modal">
