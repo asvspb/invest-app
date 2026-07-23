@@ -1,18 +1,14 @@
-/**
- * @fileoverview Frontend entrypoint.
- *
- * Imports all calculator modules and exposes their handlers on `window` so the
- * existing HTML `onclick="..."` attributes keep working (minimal-regression
- * migration: no addEventListener rewrite yet — that's a separate task).
- *
- * Replaces the single 741-line public/script.js.
- */
-
 import "./calculators/bank";
 import "./calculators/retail";
 import "./calculators/currency";
 import "./calculators/metals";
-import "../styles.css";
+
+import "./styles/tokens.css";
+import "./styles/base.css";
+import "./styles/layout.css";
+import "./styles/components.css";
+import "./styles/calculators.css";
+import "./styles/modal.css";
 
 import { calculateBankProfit, clearBankForm } from "./calculators/bank";
 import { calculateRetail, clearRetailForm } from "./calculators/retail";
@@ -20,9 +16,9 @@ import { calculateCurrency, clearCurrencyForm, fetchCbrRates } from "./calculato
 import { calculateMetal, clearMetalForm, fetchCbrMetals } from "./calculators/metals";
 import { fetchCbrRate } from "./cbr";
 import { init } from "./init";
+import { initTabs } from "./ui/tabs";
+import { initTheme } from "./ui/theme";
 
-// --- window registry: keep HTML onclick="..." contract working ---
-// Typed declaration so strict mode accepts the assignment.
 declare global {
   interface Window {
     calculateBankProfit: typeof calculateBankProfit;
@@ -52,7 +48,13 @@ window.fetchCbrRates = fetchCbrRates;
 window.fetchCbrMetals = fetchCbrMetals;
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", () => {
+    init();
+    initTabs();
+    initTheme();
+  });
 } else {
   init();
+  initTabs();
+  initTheme();
 }
