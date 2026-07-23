@@ -1,0 +1,90 @@
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--color-surface);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  animation: modalSlideIn 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: background var(--transition);
+}
+
+#calculationDetails {
+  padding: 1.5rem;
+  background: var(--color-surface-hover);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: calc(80vh - 120px);
+}
+
+#calculationDetails::-webkit-scrollbar {
+  width: 8px;
+}
+
+#calculationDetails::-webkit-scrollbar-track {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+#calculationDetails::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: 4px;
+}
+
+#calculationDetails::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+  line-height: 1;
+}
+
+.close:hover {
+  color: var(--color-text-primary);
+}
+
+#modalTitle {
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}

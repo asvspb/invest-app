@@ -1,0 +1,255 @@
+.calculator-container {
+  background: var(--color-surface);
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.calculator-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-primary);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+.col-md-6 {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover {
+  border-color: var(--color-border-hover);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+  outline: none;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.form-check-input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.form-check-label {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+form .button-group {
+  margin-top: 1.5rem;
+}
+
+.calculator-container > .button-group {
+  margin-top: 2rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.875rem;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-hover));
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: linear-gradient(to right, var(--color-secondary), var(--color-secondary-hover));
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.input-with-btn {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-with-btn input[type="text"],
+.input-with-btn select.form-select {
+  flex: 1;
+}
+
+.btn-fetch {
+  flex-shrink: 0;
+  width: 48px;
+  padding: 0.75rem 0.25rem;
+  font-size: 1.3rem;
+  background: linear-gradient(to right, var(--color-fetch), var(--color-fetch-hover));
+  box-shadow: var(--shadow-fetch);
+  border-radius: var(--radius-md);
+}
+
+.btn-fetch:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.btn-fetch.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.result {
+  padding-top: 0.25rem;
+}
+
+.result h2 {
+  color: var(--color-text-primary);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.result p {
+  color: var(--color-text-secondary);
+  margin: 0.6rem 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result-divider {
+  border: none;
+  border-top: 1px dashed var(--color-border);
+  margin: 1rem 0;
+}
+
+.deposit-title,
+.tax-title {
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+  margin: 0.75rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.deposit-highlight {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--color-primary);
+}
+
+.deposit-detail {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0.3rem 0;
+  padding-left: 0.5rem;
+}
+
+.tax-info {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin: 0.4rem 0;
+}
+
+.tax-highlight {
+  color: var(--color-danger);
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  background: var(--color-danger-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-danger);
+}
+
+.final-deposit {
+  background: var(--color-success-light);
+  border-left-color: var(--color-success);
+  color: var(--color-success);
+  font-size: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+.profit-positive {
+  color: var(--color-success);
+}
+
+.profit-negative {
+  color: var(--color-danger);
+}
