@@ -65,19 +65,27 @@ function formatDecimal(num) {
 }
 
 // Функция для отображения модального окна
-function showModal(content) {
+function showModal(paragraphs) {
     const modal = document.getElementById('calculationModal');
     const detailsContainer = document.getElementById('calculationDetails');
-    detailsContainer.innerHTML = content;
+
+    detailsContainer.replaceChildren();
+    for (const lines of paragraphs) {
+        const p = document.createElement('p');
+        lines.forEach((line, idx) => {
+            if (idx > 0) p.appendChild(document.createElement('br'));
+            p.appendChild(document.createTextNode(line));
+        });
+        detailsContainer.appendChild(p);
+    }
+
     modal.style.display = "block";
 
-    // Закрытие модального окна при клике на крестик
     const span = document.getElementsByClassName("close")[0];
     span.onclick = function () {
         modal.style.display = "none";
     }
 
-    // Закрытие модального окна при клике вне его
     window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
@@ -178,7 +186,7 @@ function calculateBankProfit() {
     let currentYearProfit = 0;
     let monthInYear = 0;
 
-    let calculationDetails = '';
+    const details = [];
 
     for (let i = 1; i <= period; i++) {
         const monthProfit = totalAmount * monthlyPercent;
@@ -192,28 +200,23 @@ function calculateBankProfit() {
             monthInYear = 0;
         }
 
-        if (showHow) {
-            calculationDetails += `<p>Месяц ${i}:<br>`;
-            calculationDetails += `Прибыль: ${formatDecimal(monthProfit)} ₽<br>`;
-        }
-
         if (isReinvest) {
             totalAmount += monthProfit;
-            if (showHow) {
-                calculationDetails += `Реинвестировано: ${formatDecimal(monthProfit)} ₽<br>`;
-            }
         }
 
         totalAmount += monthlyDeposit;
         totalDepositsSum += monthlyDeposit;
         maxBalance = Math.max(maxBalance, totalAmount);
 
-        if (showHow && monthlyDeposit > 0) {
-            calculationDetails += `Пополнение: ${formatDecimal(monthlyDeposit)} ₽<br>`;
-        }
-
         if (showHow) {
-            calculationDetails += `Итого на конец месяца: ${formatDecimal(totalAmount)} ₽</p><br>`;
+            const lines = [
+                `Месяц ${i}:`,
+                `Прибыль: ${formatDecimal(monthProfit)} ₽`
+            ];
+            if (isReinvest) lines.push(`Реинвестировано: ${formatDecimal(monthProfit)} ₽`);
+            if (monthlyDeposit > 0) lines.push(`Пополнение: ${formatDecimal(monthlyDeposit)} ₽`);
+            lines.push(`Итого на конец месяца: ${formatDecimal(totalAmount)} ₽`);
+            details.push(lines);
         }
     }
 
@@ -238,7 +241,7 @@ function calculateBankProfit() {
     document.getElementById('finalDeposit').textContent = formatNumber(finalAmount) + ' ₽';
 
     if (showHow) {
-        showModal(calculationDetails);
+        showModal(details);
     }
 }
 
