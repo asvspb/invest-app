@@ -3,11 +3,11 @@ version: '3.8'
 services:
   invest-app:
     build: .
+    image: invest-app:latest
     container_name: invest-app
     restart: unless-stopped
     ports:
       - "7777:7777"
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=7777

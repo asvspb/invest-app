@@ -52,3 +52,7 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# IDE and editor files
+.qodo
+.zcode

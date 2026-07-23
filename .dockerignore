@@ -1,7 +1,27 @@
+# Dependencies (installed fresh in the builder stage)
 node_modules
-npm-debug.log
+
+# Build output (produced inside the builder, never copy host's)
+dist
+*.tsbuildinfo
+
+# Docker / VCS meta
 Dockerfile
 .dockerignore
 .git
 .gitignore
+
+# Docs & non-runtime
 README.md
+docs
+
+# Editor / tooling
+.vscode
+.qodo
+.idea
+*.swp
+.playwright-mcp
+
+# Logs
+npm-debug.log*
+*.log
