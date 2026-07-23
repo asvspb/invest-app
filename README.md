@@ -44,10 +44,10 @@
 
 4. Запустите контейнер:
    ```bash
-   docker run -d -p 3000:3000 --name invest-calculator invest-app
+   docker run -d -p 7777:7777 --name invest-calculator invest-app
    ```
 
-5. Откройте браузер и перейдите по адресу `http://localhost:3000`
+5. Откройте браузер и перейдите по адресу `http://localhost:7777`
 
 ### Дополнительные команды Docker
 

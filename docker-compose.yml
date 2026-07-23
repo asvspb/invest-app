@@ -6,7 +6,7 @@ services:
     container_name: invest-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "7777:7777"
     volumes:
       - ./:/app
       - /app/node_modules
