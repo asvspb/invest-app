@@ -85,7 +85,7 @@ main {
 .tab-panel {
   display: none;
   width: 100%;
-  max-width: 960px;
+  max-width: 1060px;
 }
 
 .tab-panel.active {
