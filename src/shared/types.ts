@@ -5,14 +5,24 @@
 
 /** Result of progressive NDFL calculation (ст. 214.2 НК РФ). */
 export interface TaxResult {
-  /** Yearly tax-free allowance: max(maxBalance, 1_000_000) × effectiveRate. */
   yearlyLimit: number;
-  /** Total taxable income across all years (after allowance). */
   taxableIncome: number;
-  /** Final NDFL amount to pay (progressive 13%/15%). */
   taxAmount: number;
-  /** Accumulated tax-free profit used. */
   taxFreeUsed: number;
+}
+
+/** Property tax result (ст. 217 п.17.1 + ст. 220 НК РФ) for OMS/currency sale. */
+export interface PropertyTaxResult {
+  /** true if holdPeriod ≥ 3 years (≈1095 days) — income fully exempt. */
+  isExempt: boolean;
+  /** Holding period in whole+fractional years (holdPeriod / 365). */
+  holdingYears: number;
+  /** 250 000₽ deduction applied when no purchase docs (0 otherwise). */
+  deductionApplied: number;
+  /** Taxable property income (≥ 0), after expenses or deduction. */
+  taxableIncome: number;
+  /** NDFL: 13% up to 2.4M, 15% above (0 if exempt or no base). */
+  taxAmount: number;
 }
 
 /** Input params for the shared buy-low/sell-high core (currency & metals). */
@@ -27,8 +37,10 @@ export interface AssetRoundTripParams {
   refPrice: number;
   /** CBR key rate (%) for tax-free threshold. */
   keyRate: number;
-  /** Holding period in days (for annualized yield). */
+  /** Holding period in days (for annualized yield + 3-year exemption). */
   holdPeriod: number;
+  /** Purchase documents available? true → expenses used; false → 250 000₽ deduction. */
+  hasPurchaseDocs: boolean;
 }
 
 /** Result of the shared buy-low/sell-high core. */
@@ -55,8 +67,8 @@ export interface AssetRoundTripResult {
   marginSell: number;
   /** totalMargin (%). */
   marginTotal: number;
-  /** NDFL result for this round-trip. */
-  tax: TaxResult;
+  /** Property NDFL result (ст. 217/220) — OMS & currency are property, not deposits. */
+  tax: PropertyTaxResult;
   /** Final rubles after tax: rubAfterSell - tax.taxAmount. */
   finalAmount: number;
 }
@@ -73,6 +85,23 @@ export interface RetailMetrics {
   roi: number;
   /** Annualized yield (%) = ROI × 12 / period. */
   yearlyYield: number;
+}
+
+/** Retail tax regime (НПД / УСН доходы / УСН доходы−расходы / ОСНО). */
+export type RetailTaxRegime = "npd" | "usn-income" | "usn-dr" | "osno";
+
+/** Result of the retail tax calculation (one of NPD / USN / ОСНО regimes). */
+export interface RetailTaxResult {
+  /** Selected regime (RetailTaxRegime value). */
+  regime: string;
+  /** Tax base of the regime (revenue for НПД/УСН-доходы, profit for УСН-ДР/ОСНО). */
+  taxableIncome: number;
+  /** Tax payable for the regime. */
+  taxAmount: number;
+  /** Effective rate vs revenue (%): tax / revenue × 100 (0 if revenue = 0). */
+  effectiveRatePct: number;
+  /** Human-readable explanation for the UI. */
+  note: string;
 }
 
 // --- CBR API response contracts (server → client) ---

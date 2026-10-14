@@ -33,6 +33,12 @@ function bySelect(id: string): HTMLSelectElement {
   return el;
 }
 
+function byCheckbox(id: string): HTMLInputElement {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLInputElement)) throw new Error(`[metals] #${id} is not a checkbox`);
+  return el;
+}
+
 export function fetchCbrMetals(): void {
   const btn = byId("metal-fetch-btn");
   const metalType = bySelect("metal-type").value;
@@ -101,6 +107,8 @@ export function calculateMetal(): void {
     return;
   }
 
+  const hasDocs = byCheckbox("metal-has-docs").checked;
+
   const r = calculateAssetRoundTrip({
     amount,
     buyPrice,
@@ -108,6 +116,7 @@ export function calculateMetal(): void {
     refPrice: lastCbrMetalPrice ?? 0,
     keyRate: cbrRate,
     holdPeriod,
+    hasPurchaseDocs: hasDocs,
   });
 
   const resultEl = byId("metal-result");
@@ -131,9 +140,12 @@ export function calculateMetal(): void {
   byId("metal-spread").textContent = formatDecimal(r.totalSpread) + " ₽";
   byId("metal-margin").textContent = formatDecimal(r.marginTotal) + " %";
 
-  byId("metal-taxFreeLimit").textContent = formatNumber(r.tax.yearlyLimit) + " ₽/год";
-  byId("metal-taxableAmount").textContent = formatNumber(r.tax.taxableIncome) + " ₽";
-  byId("metal-taxAmount").textContent = formatNumber(r.tax.taxAmount) + " ₽";
+  byId("metal-hold-years").textContent = r.tax.holdingYears.toFixed(1);
+  byId("metal-prop-tax-free").textContent = r.tax.isExempt ? "Да (≥3 лет)" : "Нет";
+  byId("metal-prop-deduction").textContent = formatNumber(r.tax.deductionApplied) + " ₽";
+  byId("metal-prop-taxable").textContent = formatNumber(r.tax.taxableIncome) + " ₽";
+  byId("metal-prop-tax-amount").textContent =
+    r.tax.isExempt ? "0 ₽ (освобождено)" : formatNumber(r.tax.taxAmount) + " ₽";
   byId("metal-finalDeposit").textContent = formatNumber(r.finalAmount) + " ₽";
 }
 
@@ -143,6 +155,7 @@ export function clearMetalForm(): void {
   byInput("metal-sell-price").value = "0";
   byInput("metal-cbr-rate").value = "21";
   byInput("metal-hold-period").value = "365";
+  byCheckbox("metal-has-docs").checked = true;
   byId("metal-result").textContent = "0 ₽";
   byId("metal-result").className = "";
   byId("metal-bought").textContent = "0";
@@ -157,8 +170,10 @@ export function clearMetalForm(): void {
   byId("metal-margin-sell").textContent = "0 %";
   byId("metal-spread").textContent = "0 ₽";
   byId("metal-margin").textContent = "0 %";
-  byId("metal-taxFreeLimit").textContent = "0 ₽/год";
-  byId("metal-taxableAmount").textContent = "0 ₽";
-  byId("metal-taxAmount").textContent = "0 ₽";
+  byId("metal-hold-years").textContent = "0";
+  byId("metal-prop-tax-free").textContent = "—";
+  byId("metal-prop-deduction").textContent = "0 ₽";
+  byId("metal-prop-taxable").textContent = "0 ₽";
+  byId("metal-prop-tax-amount").textContent = "0 ₽";
   byId("metal-finalDeposit").textContent = "0 ₽";
 }

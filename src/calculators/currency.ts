@@ -33,6 +33,12 @@ function bySelect(id: string): HTMLSelectElement {
   return el;
 }
 
+function byCheckbox(id: string): HTMLInputElement {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLInputElement)) throw new Error(`[currency] #${id} is not a checkbox`);
+  return el;
+}
+
 export function fetchCbrRates(): void {
   const btn = byId("fetch-cbr-rates-btn");
   const code = bySelect("currency-code").value;
@@ -98,6 +104,8 @@ export function calculateCurrency(): void {
     return;
   }
 
+  const hasDocs = byCheckbox("currency-has-docs").checked;
+
   const r = calculateAssetRoundTrip({
     amount,
     buyPrice: sellRate,
@@ -105,6 +113,7 @@ export function calculateCurrency(): void {
     refPrice: lastCbrExchangeRate ?? 0,
     keyRate: cbrRate,
     holdPeriod,
+    hasPurchaseDocs: hasDocs,
   });
 
   const resultEl = byId("currency-result");
@@ -130,9 +139,14 @@ export function calculateCurrency(): void {
   byId("currency-spread").textContent = formatDecimal(r.totalSpread) + " ₽";
   byId("currency-margin").textContent = formatDecimal(r.marginTotal) + " %";
 
-  byId("currency-taxFreeLimit").textContent = formatNumber(r.tax.yearlyLimit) + " ₽/год";
-  byId("currency-taxableAmount").textContent = formatNumber(r.tax.taxableIncome) + " ₽";
-  byId("currency-taxAmount").textContent = formatNumber(r.tax.taxAmount) + " ₽";
+  byId("currency-rate-spread").textContent = formatNumber(r.profit) + " ₽";
+
+  byId("currency-hold-years").textContent = r.tax.holdingYears.toFixed(1);
+  byId("currency-prop-tax-free").textContent = r.tax.isExempt ? "Да (≥3 лет)" : "Нет";
+  byId("currency-prop-deduction").textContent = formatNumber(r.tax.deductionApplied) + " ₽";
+  byId("currency-prop-taxable").textContent = formatNumber(r.tax.taxableIncome) + " ₽";
+  byId("currency-prop-tax-amount").textContent =
+    r.tax.isExempt ? "0 ₽ (освобождено)" : formatNumber(r.tax.taxAmount) + " ₽";
   byId("currency-finalDeposit").textContent = formatNumber(r.finalAmount) + " ₽";
 }
 
@@ -142,6 +156,7 @@ export function clearCurrencyForm(): void {
   byInput("currency-buy-rate").value = "0";
   byInput("currency-cbr-rate").value = "21";
   byInput("currency-hold-period").value = "1";
+  byCheckbox("currency-has-docs").checked = true;
   byId("currency-result").textContent = "0 ₽";
   byId("currency-result").className = "";
   byId("currency-bought").textContent = "0";
@@ -156,8 +171,11 @@ export function clearCurrencyForm(): void {
   byId("currency-margin-buy").textContent = "0 %";
   byId("currency-spread").textContent = "0 ₽";
   byId("currency-margin").textContent = "0 %";
-  byId("currency-taxFreeLimit").textContent = "0 ₽/год";
-  byId("currency-taxableAmount").textContent = "0 ₽";
-  byId("currency-taxAmount").textContent = "0 ₽";
+  byId("currency-rate-spread").textContent = "0 ₽";
+  byId("currency-hold-years").textContent = "0";
+  byId("currency-prop-tax-free").textContent = "—";
+  byId("currency-prop-deduction").textContent = "0 ₽";
+  byId("currency-prop-taxable").textContent = "0 ₽";
+  byId("currency-prop-tax-amount").textContent = "0 ₽";
   byId("currency-finalDeposit").textContent = "0 ₽";
 }

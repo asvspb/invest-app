@@ -3,9 +3,10 @@
  * Logic ported 1:1 from calculateRetail/clearRetailForm in script.js.
  */
 
-import { calculateTax } from "@shared/tax";
 import { formatDecimal, formatNumber, parseFormattedNumber } from "@shared/format";
-import type { RetailMetrics } from "@shared/types";
+import { calculateRetailTax } from "@shared/retail-tax";
+import type { NpdClientType } from "@shared/retail-tax";
+import type { RetailMetrics, RetailTaxRegime } from "@shared/types";
 
 function byId(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -16,6 +17,12 @@ function byId(id: string): HTMLElement {
 function byInput(id: string): HTMLInputElement {
   const el = document.getElementById(id);
   if (!(el instanceof HTMLInputElement)) throw new Error(`[retail] #${id} is not an input`);
+  return el;
+}
+
+function bySelect(id: string): HTMLSelectElement {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLSelectElement)) throw new Error(`[retail] #${id} is not a select`);
   return el;
 }
 
@@ -41,13 +48,11 @@ export function calculateRetail(): void {
   const costInput = byInput("retail-cost-price");
   const expensesInput = byInput("retail-expenses");
   const periodInput = byInput("retail-period");
-  const cbrRateInput = byInput("retail-cbr-rate");
 
   const revenue = parseFormattedNumber(revenueInput.value);
   const cost = parseFormattedNumber(costInput.value);
   const expenses = parseFormattedNumber(expensesInput.value);
   const period = parseInt(periodInput.value, 10) || 0;
-  const cbrRate = parseFloat(cbrRateInput.value) || 21;
 
   // Validation with inline DOM message (no alert — AGENTS.md §7).
   if (isNaN(revenue) || revenue < 0) {
@@ -78,9 +83,11 @@ export function calculateRetail(): void {
     period,
   );
 
-  // Loss is not taxed (Math.max). maxBalance = invested capital.
-  const taxResult = calculateTax([Math.max(profit, 0)], cost + expenses, cbrRate);
-  const finalAmount = profit - taxResult.taxAmount;
+  const regime = bySelect("retail-regime").value as RetailTaxRegime;
+  const npdType = bySelect("retail-npd-client").value as NpdClientType;
+  byId("retail-npd-client-wrap").hidden = regime !== "npd";
+
+  const taxRes = calculateRetailTax(regime, revenue, cost, expenses, npdType);
 
   byId("retail-profit-amount").textContent = formatNumber(profit) + " ₽";
   byId("retail-markup").textContent = formatDecimal(markup) + " %";
@@ -92,8 +99,12 @@ export function calculateRetail(): void {
   byId("retail-detail-cost").textContent = formatNumber(cost) + " ₽";
   byId("retail-detail-expenses").textContent = formatNumber(expenses) + " ₽";
 
-  byId("retail-taxAmount").textContent = formatNumber(taxResult.taxAmount) + " ₽";
-  byId("retail-finalDeposit").textContent = formatNumber(finalAmount) + " ₽";
+  byId("retail-tax-base").textContent = formatNumber(taxRes.taxableIncome) + " ₽";
+  byId("retail-tax-rate").textContent = formatDecimal(taxRes.effectiveRatePct) + " %";
+  byId("retail-tax-amount").textContent = formatNumber(taxRes.taxAmount) + " ₽";
+  byId("retail-tax-note").textContent = taxRes.note;
+
+  byId("retail-finalDeposit").textContent = formatNumber(profit - taxRes.taxAmount) + " ₽";
 }
 
 export function clearRetailForm(): void {
@@ -101,7 +112,9 @@ export function clearRetailForm(): void {
   byInput("retail-cost-price").value = "0";
   byInput("retail-expenses").value = "0";
   byInput("retail-period").value = "1";
-  byInput("retail-cbr-rate").value = "21";
+  bySelect("retail-regime").value = "osno";
+  bySelect("retail-npd-client").value = "individual";
+  byId("retail-npd-client-wrap").hidden = true;
   byId("retail-profit-amount").textContent = "0 ₽";
   byId("retail-markup").textContent = "0 %";
   byId("retail-margin").textContent = "0 %";
@@ -110,6 +123,9 @@ export function clearRetailForm(): void {
   byId("retail-detail-revenue").textContent = "0 ₽";
   byId("retail-detail-cost").textContent = "0 ₽";
   byId("retail-detail-expenses").textContent = "0 ₽";
-  byId("retail-taxAmount").textContent = "0 ₽";
+  byId("retail-tax-base").textContent = "0 ₽";
+  byId("retail-tax-rate").textContent = "0 %";
+  byId("retail-tax-amount").textContent = "0 ₽";
+  byId("retail-tax-note").textContent = "—";
   byId("retail-finalDeposit").textContent = "0 ₽";
 }

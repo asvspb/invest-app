@@ -10,7 +10,6 @@ import type { CbrRateResponse } from "@shared/types";
 /** Input ids that share the synced CBR key rate across calculators. */
 export const CBR_RATE_INPUTS = [
   "cbr-rate",
-  "retail-cbr-rate",
   "currency-cbr-rate",
   "metal-cbr-rate",
 ] as const;

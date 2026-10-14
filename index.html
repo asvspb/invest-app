@@ -67,6 +67,12 @@
                                         <input type="checkbox" class="form-check-input" id="show-how">
                                         <label class="form-check-label" for="show-how">Показать вычисление</label>
                                     </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="bank-escrow">
+                                        <label class="form-check-label" for="bank-escrow">Счёт эскроу (без НДФЛ)</label>
+                                        <input type="checkbox" class="form-check-input" id="bank-low-rate">
+                                        <label class="form-check-label" for="bank-low-rate">Ставка ≤1% (без НДФЛ)</label>
+                                    </div>
 
                                     <div class="button-group">
                                         <button type="button" class="btn btn-primary"
@@ -127,13 +133,21 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="retail-cbr-rate">Ключевая ставка ЦБ (%)</label>
-                                    <div class="input-with-btn">
-                                        <input type="text" class="form-control" id="retail-cbr-rate" inputmode="decimal"
-                                            data-step="0.1" data-min="0">
-                                        <button type="button" class="btn btn-fetch btn-fetch-cbr" id="retail-fetch-cbr-rate"
-                                            onclick="fetchCbrRate()">↻</button>
-                                    </div>
+                                    <label for="retail-regime">Режим налогообложения</label>
+                                    <select id="retail-regime" class="form-control form-select">
+                                        <option value="osno">ОСНО (НДФЛ 13%/15%)</option>
+                                        <option value="usn-income">УСН «доходы» 6%</option>
+                                        <option value="usn-dr">УСН «доходы−расходы» 15%</option>
+                                        <option value="npd">Самозанятость (НПД)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="retail-npd-client-wrap" hidden>
+                                    <label for="retail-npd-client">Кому продаёте (для НПД)</label>
+                                    <select id="retail-npd-client" class="form-control form-select">
+                                        <option value="individual">Физлицам — 4%</option>
+                                        <option value="business">Юрлицам и ИП — 6%</option>
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
@@ -160,9 +174,11 @@
                                 <p class="deposit-detail">Себестоимость: <span id="retail-detail-cost">0 ₽</span></p>
                                 <p class="deposit-detail">Расходы: <span id="retail-detail-expenses">0 ₽</span></p>
                                 <hr class="result-divider">
-                                <h3 class="tax-title">Налогообложение (НДФЛ 13%)</h3>
-                                <p class="tax-info tax-highlight">Налог к уплате: <span id="retail-taxAmount">0 ₽</span></p>
-                                <p class="deposit-highlight final-deposit">ИТОГО на руках: <span id="retail-finalDeposit">0 ₽</span></p>
+                                <h3 class="tax-title">Налог: <span id="retail-tax-note">—</span></h3>
+                                <p class="tax-info">Налоговая база: <span id="retail-tax-base">0 ₽</span></p>
+                                <p class="tax-info">Эффективная ставка: <span id="retail-tax-rate">0 %</span></p>
+                                <p class="tax-info tax-highlight">Налог к уплате: <span id="retail-tax-amount">0 ₽</span></p>
+                                <p class="deposit-highlight final-deposit">ИТОГО на руках (после налога): <span id="retail-finalDeposit">0 ₽</span></p>
                             </div>
                         </div>
                     </div>
@@ -200,18 +216,19 @@
                                         inputmode="numeric">
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="currency-sell-rate">Курс покупки валюты (₽ за ед.)</label>
-                                    <input type="text" class="form-control" id="currency-sell-rate" inputmode="decimal"
-                                        data-step="0.01" data-min="0">
-                                    <small class="field-hint">Курс, по которому банк продаёт валюту вам</small>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="currency-buy-rate">Курс продажи валюты (₽ за ед.)</label>
-                                    <input type="text" class="form-control" id="currency-buy-rate" inputmode="decimal"
-                                        data-step="0.01" data-min="0">
-                                    <small class="field-hint">Курс, по которому банк покупает валюту у вас</small>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="currency-sell-rate">Курс покупки (₽/ед.)</label>
+                                        <input type="text" class="form-control" id="currency-sell-rate" inputmode="decimal"
+                                            data-step="0.01" data-min="0">
+                                        <small class="field-hint">Банк продаёт вам</small>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="currency-buy-rate">Курс продажи (₽/ед.)</label>
+                                        <input type="text" class="form-control" id="currency-buy-rate" inputmode="decimal"
+                                            data-step="0.01" data-min="0">
+                                        <small class="field-hint">Банк покупает у вас</small>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -223,6 +240,11 @@
                                 <div class="form-group">
                                     <label for="currency-hold-period">Период владения (дней)</label>
                                     <input type="number" class="form-control" id="currency-hold-period" min="1" value="1">
+                                </div>
+
+                                <div class="form-check">
+                                    <input type="checkbox" id="currency-has-docs" checked>
+                                    <label for="currency-has-docs">Есть документы на покупку (иначе — вычет 250 000 ₽)</label>
                                 </div>
                             </div>
 
@@ -246,11 +268,14 @@
                                         class="spread-pct">0 %</span></p>
                                 <p>Общий спред: <span id="currency-spread">0 ₽</span> <span id="currency-margin"
                                         class="spread-pct">0 %</span></p>
+                                <p class="tax-info">Курсовая разница (не облагается): <span id="currency-rate-spread">0 ₽</span></p>
                                 <hr class="result-divider">
-                                <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
-                                <p class="tax-info">Необлагаемый лимит: <span id="currency-taxFreeLimit">0 ₽</span></p>
-                                <p class="tax-info">Облагаемая сумма: <span id="currency-taxableAmount">0 ₽</span></p>
-                                <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="currency-taxAmount">0 ₽</span></p>
+                                <h3 class="tax-title">Налог с продажи валюты (ст. 217, 220 НК РФ)</h3>
+                                <p class="tax-info">Период владения: <span id="currency-hold-years">0</span> лет</p>
+                                <p class="tax-info">Льгота (≥3 лет): <span id="currency-prop-tax-free">—</span></p>
+                                <p class="tax-info">Вычет: <span id="currency-prop-deduction">0 ₽</span></p>
+                                <p class="tax-info">Облагаемый доход: <span id="currency-prop-taxable">0 ₽</span></p>
+                                <p class="tax-info tax-highlight">Налог к уплате: <span id="currency-prop-tax-amount">0 ₽</span></p>
                                 <p class="deposit-highlight final-deposit">ИТОГО на руках: <span
                                         id="currency-finalDeposit">0 ₽</span></p>
                             </div>
@@ -287,16 +312,17 @@
                                         inputmode="numeric">
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="metal-buy-price">Цена покупки (₽/г)</label>
-                                    <input type="text" class="form-control" id="metal-buy-price" inputmode="decimal"
-                                        data-step="0.01" data-min="0">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="metal-sell-price">Цена продажи (₽/г)</label>
-                                    <input type="text" class="form-control" id="metal-sell-price" inputmode="decimal"
-                                        data-step="0.01" data-min="0">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="metal-buy-price">Цена покупки (₽/г)</label>
+                                        <input type="text" class="form-control" id="metal-buy-price" inputmode="decimal"
+                                            data-step="0.01" data-min="0">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="metal-sell-price">Цена продажи (₽/г)</label>
+                                        <input type="text" class="form-control" id="metal-sell-price" inputmode="decimal"
+                                            data-step="0.01" data-min="0">
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -308,6 +334,11 @@
                                 <div class="form-group">
                                     <label for="metal-hold-period">Период владения (дней)</label>
                                     <input type="number" class="form-control" id="metal-hold-period" min="1" value="365">
+                                </div>
+
+                                <div class="form-check">
+                                    <input type="checkbox" id="metal-has-docs" checked>
+                                    <label for="metal-has-docs">Есть документы на покупку (иначе — вычет 250 000 ₽)</label>
                                 </div>
                             </div>
 
@@ -332,10 +363,12 @@
                                 <p>Общий спред: <span id="metal-spread">0 ₽</span> <span id="metal-margin"
                                         class="spread-pct">0 %</span></p>
                                 <hr class="result-divider">
-                                <h3 class="tax-title">Налогообложение (ст. 214.2 НК РФ)</h3>
-                                <p class="tax-info">Необлагаемый лимит: <span id="metal-taxFreeLimit">0 ₽</span></p>
-                                <p class="tax-info">Облагаемая сумма: <span id="metal-taxableAmount">0 ₽</span></p>
-                                <p class="tax-info tax-highlight">Налог к уплате (НДФЛ): <span id="metal-taxAmount">0 ₽</span></p>
+                                <h3 class="tax-title">Налог с продажи металла (ст. 217, 220 НК РФ)</h3>
+                                <p class="tax-info">Период владения: <span id="metal-hold-years">0</span> лет</p>
+                                <p class="tax-info">Льгота (≥3 лет): <span id="metal-prop-tax-free">—</span></p>
+                                <p class="tax-info">Вычет: <span id="metal-prop-deduction">0 ₽</span></p>
+                                <p class="tax-info">Облагаемый доход: <span id="metal-prop-taxable">0 ₽</span></p>
+                                <p class="tax-info tax-highlight">Налог к уплате: <span id="metal-prop-tax-amount">0 ₽</span></p>
                                 <p class="deposit-highlight final-deposit">ИТОГО на руках: <span
                                         id="metal-finalDeposit">0 ₽</span></p>
                             </div>

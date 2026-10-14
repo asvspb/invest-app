@@ -73,6 +73,8 @@ export function calculateBankProfit(): void {
   const annualPercent = parseFloat(annualPercentInput.value);
   const cbrRate = parseFloat(cbrRateInput.value) || 21;
   const isReinvest = byCheckbox("reinvest").checked;
+  const isEscrow = byCheckbox("bank-escrow").checked;
+  const isLowRate = byCheckbox("bank-low-rate").checked;
   const monthlyDeposit = parseFormattedNumber(monthlyDepositInput.value);
   const showHow = byCheckbox("show-how").checked;
 
@@ -141,7 +143,10 @@ export function calculateBankProfit(): void {
     }
   }
 
-  const taxResult = calculateTax(profitByYear, maxBalance, cbrRate);
+  const noTax = isEscrow || isLowRate;
+  const taxResult = noTax
+    ? { yearlyLimit: 0, taxableIncome: 0, taxAmount: 0, taxFreeUsed: 0 }
+    : calculateTax(profitByYear, maxBalance, cbrRate);
 
   const finalAmount = initialAmount + totalDepositsSum + totalProfit - taxResult.taxAmount;
   const yearlyProfit = (totalProfit / period) * 12;
@@ -173,6 +178,8 @@ export function clearBankForm(): void {
   byInput("cbr-rate").value = "21";
   byInput("monthly-deposit").value = "0";
   byCheckbox("reinvest").checked = false;
+  byCheckbox("bank-escrow").checked = false;
+  byCheckbox("bank-low-rate").checked = false;
   byCheckbox("show-how").checked = false;
   byId("profit").textContent = "0 ₽";
   byId("monthlyProfit").textContent = "0 ₽";

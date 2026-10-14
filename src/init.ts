@@ -38,7 +38,6 @@ function initPercentInputs(): void {
   const percentIds = [
     "percent",
     "cbr-rate",
-    "retail-cbr-rate",
     "currency-sell-rate",
     "currency-buy-rate",
     "currency-cbr-rate",
