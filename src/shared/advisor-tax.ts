@@ -16,7 +16,7 @@ import { ASSET_CLASSES, ASSET_ORDER } from "./advisor-portfolio";
 
 export const TAX_RULES_VERSION_RU = "НК РФ, редакция 2025–2026 — проверить на дату сделки";
 
-/** ЛДВ: 3 млн ₽ необлагаемой прибыли за каждый полный год владения (бумаги МосБиржи). */
+/** ЛДВ (ст. 219.1 НК РФ): право после более 3 лет владения (порог — до отметки 0 ₽), далее 3 млн ₽ за каждый полный год; бумаги МосБиржи. */
 export const LDV_ANNUAL_EXEMPTION_RUB = 3_000_000;
 
 /** ИИС-3 (§10): дедлайн открытия — 31.12.2026. */
@@ -114,7 +114,7 @@ export function compareDepositsVsBonds(
   const unprotectedRub = Math.max(0, depositCapitalRub - DIA_BASE_LIMIT_RUB);
 
   // Чистые доходности: вклад — с льготой не облагается часть процентов;
-  // ОФЗ — 13% без ЛДВ (ЛДВ применима только с 3-го года владения).
+  // ОФЗ — 13% без ЛДВ (право на ЛДВ возникает только после 3 лет владения с даты покупки).
   const exemption = DEPOSIT_EXEMPTION_BASE_RUB * (maxKeyRateOfYearPercent / 100);
   const depositTaxableFactor = Math.max(0, 1 - exemption / Math.max(depositCapitalRub * DEPOSIT_TOP_APR_PERCENT / 100, 1));
   const netDeposit = DEPOSIT_TOP_APR_PERCENT * (1 - 0.13 * depositTaxableFactor);

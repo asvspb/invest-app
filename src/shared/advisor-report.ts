@@ -63,7 +63,7 @@ export function buildAdvisorReport(
   lines.push(`Версия правил: ${tax.taxRulesVersionRu}`);
   lines.push(`- Доход ${rub(tax.grossIncomeRub)}, база ${rub(tax.taxableBaseRub)}, НДФЛ ${rub(tax.taxAmountRub)}`);
   lines.push(`- Чистая доходность: ${tax.netYieldPercent}% годовых`);
-  lines.push(`- ЛДВ: классов-кандидатов ${tax.ldvEligibleClasses} (3 млн ₽/год владения, с 3-го года)`);
+  lines.push(`- ЛДВ: классов-кандидатов ${tax.ldvEligibleClasses} (3 млн ₽/год владения; право после 3 лет с даты покупки — порог, до отметки 0 ₽)`);
   lines.push(`- ИИС-3: открытие до ${IIS3_DEADLINE_RU} на ${5} лет, освобождение до 30 млн ₽`);
   lines.push("");
 

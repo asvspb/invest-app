@@ -132,7 +132,7 @@ export function renderTax(
     ),
     p(
       "ЛДВ",
-      `${tax.ldvEligibleClasses} класса-кандидата × 3 млн ₽/год владения (с 3-го года)`,
+      `${tax.ldvEligibleClasses} класса-кандидата × 3 млн ₽/год владения; право после 3 лет с покупки (до — 0 ₽, порог)`,
       "deposit-detail",
     ),
   );
