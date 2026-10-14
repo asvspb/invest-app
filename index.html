@@ -16,6 +16,7 @@
                 <button class="tab-btn" data-tab="retail">Ретейл</button>
                 <button class="tab-btn" data-tab="currency">Валюта</button>
                 <button class="tab-btn" data-tab="metals">Драгметаллы</button>
+                <button class="tab-btn" data-tab="advisor">Советник</button>
             </nav>
             <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">🌙</button>
         </header>
@@ -372,6 +373,115 @@
                                 <p class="deposit-highlight final-deposit">ИТОГО на руках: <span
                                         id="metal-finalDeposit">0 ₽</span></p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" data-tab="advisor">
+                <div class="calculator-container">
+                    <h2 class="calculator-title">Советник — Wealth Advisor v4.0</h2>
+                    <p class="adv-priority" id="adv-priority"></p>
+                    <div class="calc-layout">
+                        <div class="calc-form">
+                            <div class="form-group">
+                                <label for="adv-capital">Капитал (₽)</label>
+                                <input type="text" class="form-control" id="adv-capital" inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="adv-horizon">Горизонт (лет)</label>
+                                    <input type="number" class="form-control" id="adv-horizon" min="1" max="20">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="adv-stop">Стоп-триггер (%)</label>
+                                    <input type="text" class="form-control" id="adv-stop" inputmode="decimal">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="adv-keyrate">Ключевая ставка (%)</label>
+                                    <div class="input-with-btn">
+                                        <input type="text" class="form-control" id="adv-keyrate" inputmode="decimal">
+                                        <button type="button" class="btn btn-fetch btn-fetch-cbr" id="adv-fetch-rate"
+                                            onclick="fetchCbrRate()">↻</button>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="adv-maxkeyrate">Макс. ставка года (%)</label>
+                                    <input type="text" class="form-control" id="adv-maxkeyrate" inputmode="decimal">
+                                    <small class="field-hint">Максимальная ключевая ставка года — льгота по вкладам (§10)</small>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="adv-target-yield">Цель по доходности (%)</label>
+                                    <input type="text" class="form-control" id="adv-target-yield" inputmode="decimal">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="adv-target-capital">Целевая сумма (₽)</label>
+                                    <input type="text" class="form-control" id="adv-target-capital" inputmode="numeric"
+                                        pattern="[0-9]*">
+                                </div>
+                            </div>
+                            <p class="adv-error" id="adv-error"></p>
+                            <div class="adv-presets">
+                                <button type="button" class="btn btn-primary" id="adv-preset-v2">План v2</button>
+                                <button type="button" class="btn btn-secondary" id="adv-preset-cautious">Осторожный</button>
+                                <button type="button" class="btn btn-secondary" id="adv-preset-maxyield">Макс. доходность</button>
+                                <button type="button" class="btn btn-secondary" id="adv-preset-minrisk">Мин. риск</button>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="adv-autobalance" checked>
+                                <label class="form-check-label" for="adv-autobalance">Авто-балансировка долей к 100%</label>
+                            </div>
+                            <table class="adv-table">
+                                <thead>
+                                    <tr>
+                                        <th>Класс активов</th>
+                                        <th>Доля %</th>
+                                        <th>₽</th>
+                                        <th>Доходность</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adv-allocation-rows"></tbody>
+                            </table>
+                        </div>
+                        <div class="calc-result adv-results">
+                            <div class="result">
+                                <h3 class="deposit-title" id="adv-plan-label">План</h3>
+                                <div id="adv-summary"></div>
+                            </div>
+                            <div class="result">
+                                <h3 class="tax-title">Стоп-связка (§7)</h3>
+                                <div id="adv-stopbinding" class="adv-binding"></div>
+                                <button type="button" class="btn btn-primary" id="adv-apply-cut" hidden>Резать акции до нормы</button>
+                            </div>
+                            <div class="result">
+                                <h3 class="tax-title">Стресс-сценарии (§9)</h3>
+                                <div id="adv-stress" class="stress-grid"></div>
+                            </div>
+                            <div class="result">
+                                <h3 class="tax-title">Потолок доходности (§6)</h3>
+                                <div id="adv-yield"></div>
+                            </div>
+                            <div class="result">
+                                <h3 class="tax-title">Налоги (§10)</h3>
+                                <div id="adv-tax"></div>
+                            </div>
+                            <div class="result">
+                                <h3 class="tax-title">Вклады vs ОФЗ (§12)</h3>
+                                <div id="adv-deposit"></div>
+                            </div>
+                            <div class="result">
+                                <details class="adv-report">
+                                    <summary>Канон-отчёт (§16)</summary>
+                                    <button type="button" class="btn btn-secondary" id="adv-copy-report">Копировать отчёт</button>
+                                    <pre id="adv-report-text"></pre>
+                                </details>
+                            </div>
+                            <p class="audit-badge" id="adv-audit"></p>
+                            <p class="field-hint">Методика: docs/prompts/wealth-advisor-v4.md · перенос лучшего из finGuard</p>
                         </div>
                     </div>
                 </div>

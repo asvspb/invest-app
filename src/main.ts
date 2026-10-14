@@ -9,11 +9,13 @@ import "./styles/layout.css";
 import "./styles/components.css";
 import "./styles/calculators.css";
 import "./styles/modal.css";
+import "./styles/advisor.css";
 
 import { calculateBankProfit, clearBankForm } from "./calculators/bank";
 import { calculateRetail, clearRetailForm } from "./calculators/retail";
 import { calculateCurrency, clearCurrencyForm, fetchCbrRates } from "./calculators/currency";
 import { calculateMetal, clearMetalForm, fetchCbrMetals } from "./calculators/metals";
+import { initAdvisor } from "./calculators/advisor";
 import { fetchCbrRate } from "./cbr";
 import { init } from "./init";
 import { initTabs } from "./ui/tabs";
@@ -52,9 +54,11 @@ if (document.readyState === "loading") {
     init();
     initTabs();
     initTheme();
+    initAdvisor();
   });
 } else {
   init();
   initTabs();
   initTheme();
+  initAdvisor();
 }

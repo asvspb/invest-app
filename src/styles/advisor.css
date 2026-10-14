@@ -1,0 +1,204 @@
+/* Advisor tab (методика v4) — перенос из finGuard, vanilla DOM. */
+
+.adv-priority {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  border-left: 3px solid var(--color-primary);
+  padding-left: 0.6rem;
+}
+
+.adv-error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  min-height: 1.2em;
+  margin: 0.4rem 0;
+}
+
+.adv-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+}
+
+/* Таблица аллокации */
+.adv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 0.6rem;
+}
+
+.adv-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.adv-table td {
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--color-divider);
+  vertical-align: middle;
+}
+
+.adv-table .share-input {
+  width: 4.2rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adv-table .alloc-rub {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adv-table .alloc-tag {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+/* Колонка результатов — стопка карточек */
+.adv-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Стоп-связка */
+.adv-binding {
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-success);
+  background: var(--color-success-light);
+}
+
+.adv-binding.binding-fail {
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-light);
+}
+
+.adv-binding + .btn {
+  margin-top: 0.6rem;
+}
+
+/* Сетка стресс-сценариев */
+.stress-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.stress-card {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.stress-card.stress-bad {
+  border-color: rgba(220, 38, 38, 0.45);
+  background: var(--color-danger-light);
+}
+
+.stress-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.stress-dd {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stress-bad .stress-dd {
+  color: var(--color-danger);
+}
+
+.stress-ok .stress-dd {
+  color: var(--color-success);
+}
+
+.stress-rub {
+  font-size: 0.76rem;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stress-desc {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-top: 0.2rem;
+}
+
+/* Вклады vs ОФЗ */
+.trap-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+}
+
+.trap-list li {
+  margin-bottom: 0.2rem;
+}
+
+/* Аудит-бейдж */
+.audit-badge {
+  font-size: 0.78rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-sm);
+}
+
+.audit-badge.audit-ok {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.audit-badge.audit-bad {
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+}
+
+/* Канон-отчёт */
+.adv-report summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.adv-report pre {
+  margin: 0.6rem 0 0;
+  padding: 0.8rem;
+  font-family: ui-monospace, "Cascadia Mono", monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 26rem;
+  overflow: auto;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 900px) {
+  .stress-grid {
+    grid-template-columns: 1fr;
+  }
+}

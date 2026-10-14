@@ -12,6 +12,7 @@ export const CBR_RATE_INPUTS = [
   "cbr-rate",
   "currency-cbr-rate",
   "metal-cbr-rate",
+  "adv-keyrate",
 ] as const;
 
 export async function fetchCbrRate(): Promise<void> {
